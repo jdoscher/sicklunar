@@ -13,6 +13,7 @@ import { ICONS } from "./icons";
 import { cappedPixelRatio, nextTabIndex, parseMode, type Mode } from "./lab_logic";
 import { initPlanner } from "./planner_ui";
 import { initCoverage } from "./coverage_ui";
+import { clearArea, fillShare, fitPoints, focalPx, screenBox, viewOffset, type P3, type Rect } from "./fit";
 import {
   type Frame, type OrbitMember, type SystemInfo, type Vec3,
   bodyAt, fmtDays, fmtKm, niceKm, sampleAt, stabilityLabel, toFrame, trail,
@@ -195,6 +196,7 @@ function buildGuides() {
 
 function setLine(line: Line2, pts: Vec3[]) {
   const flat: number[] = [];
+  line.userData.fitcheck = "orbit";
   for (const p of pts) flat.push(p[0] * S, p[1] * S, p[2] * S);
   const g = new LineGeometry();
   g.setPositions(flat);
@@ -260,26 +262,106 @@ function centerPoint(): THREE.Vector3 {
   return new THREE.Vector3();
 }
 
-function fitCamera(view: "top" | "side" | "front" | "iso" = "iso") {
+function fitCamera(view: View = "iso") {
   const s = sys();
   const m = state.current!;
   const pts = state.frame === "rotating" ? m.points : trail(m.points, m.period, 0, trailSpan(m), Math.min(4000, trailSteps(m)), state.frame, s.mu, m.times);
-  fitTo([...pts.map(v3), centerPoint()], view);
+  fitTo(pts.map(v3), view, { optional: [centerPoint()] });
   state.view = view;
   for (const b of $("views").querySelectorAll("button")) b.setAttribute("aria-pressed", String((b as HTMLElement).dataset.view === view));
 }
 
-function fitTo(points: THREE.Vector3[], view: "top" | "side" | "front" | "iso" = "iso") {
-  const box = new THREE.Box3().setFromPoints(points);
-  const size = box.getSize(new THREE.Vector3()).length() || 10;
-  const fitH = (size / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-  const dist = 1.15 * fitH / Math.min(1, camera.aspect);
-  const dir = { top: [0, -0.001, 1], side: [0, -1, 0.001], front: [-1, 0, 0.001], iso: [-0.6, -1, 0.65] }[view];
-  const look = box.getCenter(new THREE.Vector3());
-  camera.position.copy(look).add(new THREE.Vector3(...(dir as Vec3)).normalize().multiplyScalar(dist));
-  controls.target.copy(look);
-  camera.near = dist / 1000; camera.far = dist * 1000; camera.updateProjectionMatrix();
+type View = "top" | "side" | "front" | "iso";
+const VIEW_DIRS: Record<View, Vec3> = { top: [0, -0.001, 1], side: [0, -1, 0.001], front: [-1, 0, 0.001], iso: [-0.6, -1, 0.65] };
+/** Phones and phone landscape: the scene title and toolbar sit over the canvas, so frame the
+ *  orbit inside the clear area between them. Wider screens keep the original framing. */
+const compactMQ = matchMedia("(max-width: 819px), (max-height: 500px)");
+interface LabFit { extra?: THREE.Vector3[]; optional?: THREE.Vector3[]; labelRoom?: number; keepDir?: boolean }
+let lastFit: { points: THREE.Vector3[]; view: View; opts: LabFit } | null = null;
+let clear: Rect = { left: 0, top: 0, right: 1, bottom: 1 };
+let overlayRects: DOMRect[] = []; // title band + toolbar (viewport coords) for hiding labels under them
+
+/** Clear area of the stage (stage px), measured from the overlays' real boxes. */
+function measureClear(): Rect {
+  const sr = stage.getBoundingClientRect();
+  const shown = (el: Element | null): el is HTMLElement => !!el && (el as HTMLElement).offsetParent !== null && el.getBoundingClientRect().height > 0;
+  const title = $("title");
+  const tops: number[] = [], bottoms: number[] = [];
+  overlayRects = [];
+  if (shown(title) && title.textContent) { const r = title.getBoundingClientRect(); tops.push(r.bottom - sr.top); overlayRects.push(r); }
+  for (const el of [document.querySelector(".lab-views"), $("scalebar"), $("expand")]) {
+    if (shown(el)) { const r = el.getBoundingClientRect(); bottoms.push(r.top - sr.top); overlayRects.push(r); }
+  }
+  return clearArea(viewW, viewH, tops, bottoms, 120);
+}
+
+/** Frame `points` (plus `extra` on phones). `optional` points (the chosen view centre) are always
+ *  framed on wide screens; on phones only while the orbit still fills at least 60% of the clear area. */
+function fitTo(points: THREE.Vector3[], view: View = "iso", opts: LabFit = {}) {
+  const { extra = [], optional = [], labelRoom = 0, keepDir = false } = opts;
+  lastFit = { points, view, opts: { ...opts, keepDir: false } };
+  const box = new THREE.Box3().setFromPoints(optional.length ? points.concat(optional) : points);
+  const dirV = keepDir ? camera.position.clone().sub(controls.target).normalize() : new THREE.Vector3(...VIEW_DIRS[view]).normalize();
+  if (!compactMQ.matches) {
+    camera.clearViewOffset();
+    const size = box.getSize(new THREE.Vector3()).length() || 10;
+    const fitH = (size / 2) / Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const dist = 1.15 * fitH / Math.min(1, camera.aspect);
+    const look = box.getCenter(new THREE.Vector3());
+    camera.position.copy(look).add(dirV.multiplyScalar(dist));
+    controls.target.copy(look);
+    camera.near = dist / 1000; camera.far = dist * 1000; camera.updateProjectionMatrix();
+    invalidate();
+    return;
+  }
+  clear = measureClear();
+  const off = viewOffset(viewW, viewH, clear);
+  camera.setViewOffset(viewW, viewH, off.x, off.y, viewW, viewH);
+  const core = points.concat(extra);
+  // Earth and Moon drawn inside the framed region: keep their whole disc in view
+  const cbox = new THREE.Box3().setFromPoints(core);
+  for (const body of [primary, secondary]) {
+    const r = body.scale.x;
+    if (!body.visible || !cbox.clone().expandByScalar(r).containsPoint(body.position)) continue;
+    for (const a of [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]] as Vec3[]) core.push(body.position.clone().add(new THREE.Vector3(...a).multiplyScalar(r)));
+  }
+  const pad = { left: 14, top: 14, right: 14 + labelRoom, bottom: 14 };
+  const back = dirV;
+  const right = new THREE.Vector3().crossVectors(camera.up, back).normalize();
+  const up = new THREE.Vector3().crossVectors(back, right);
+  const F = focalPx(camera.fov, viewH);
+  const solve = (all: THREE.Vector3[]) => {
+    const look = new THREE.Box3().setFromPoints(all).getCenter(new THREE.Vector3());
+    const d = new THREE.Vector3();
+    const basis = (p: THREE.Vector3): P3 => { d.subVectors(p, look); return [d.dot(right), d.dot(up), d.dot(back)]; };
+    const fit = fitPoints(all.map(basis), F, clear, pad);
+    const cx = (clear.left + clear.right) / 2, cy = (clear.top + clear.bottom) / 2;
+    const share = fillShare(screenBox(core.map(basis), fit.dist, fit.pan, F, cx, cy) ?? fit.box, clear);
+    return { look, fit, share: Math.max(share.w, share.h) };
+  };
+  let best = solve(core);
+  if (optional.length) {
+    const withCentre = solve(core.concat(optional));
+    if (withCentre.share >= 0.6) best = withCentre;
+  }
+  const { look, fit } = best;
+  const target = look.clone().addScaledVector(right, fit.pan[0]).addScaledVector(up, fit.pan[1]);
+  controls.target.copy(target);
+  camera.position.copy(target).addScaledVector(back, fit.dist);
+  camera.near = fit.dist / 1000; camera.far = fit.dist * 1000; camera.updateProjectionMatrix();
   invalidate();
+}
+
+/** Hide 3D labels that would sit under the scene title or the toolbar (phones only). */
+function hideCoveredLabels() {
+  if (!compactMQ.matches || !overlayRects.length) return;
+  for (const el of labels.domElement.children as HTMLCollectionOf<HTMLElement>) {
+    if (el.style.display === "none") continue;
+    const r = el.getBoundingClientRect();
+    const hit = overlayRects.some(q => r.left < q.right && r.right > q.left && r.top < q.bottom && r.bottom > q.top);
+    const v = hit ? "hidden" : "";
+    if (el.style.visibility !== v) el.style.visibility = v;
+  }
 }
 
 // ---------- UI ----------
@@ -325,6 +407,13 @@ function missionList(slug?: string): string {
     `<li><b>${esc(m.name)}</b> · ${esc(m.country)} · ${esc(m.launch)} · ${esc(m.status)}</li>`).join("")}</ul>`;
 }
 
+/** Scene title (one line on phones) and its subtitle; phones show the subtitle at the top of the panel. */
+function setTitle(title: string, sub: string) {
+  const esc = (x: string) => x.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+  $("title").innerHTML = `${esc(title)}<small>${esc(sub)}</small>`;
+  $("title").title = title;
+  $("scene-sub").textContent = sub;
+}
 const FRAME_NOTE: Record<Frame, string> = { rotating: "rotating frame", "inertial-earth": "inertial, Earth-centered", "inertial-moon": "inertial, Moon-centered" };
 function renderInfo() {
   const m = state.current!;
@@ -347,7 +436,7 @@ function renderInfo() {
       <dt>Jacobi constant</dt><dd>${m.jacobi.toFixed(4)}</dd>
       <dt>Family</dt><dd>${fam.count.toLocaleString()} JPL members</dd>
     </dl>`;
-  $("title").innerHTML = `${p ? p.title : fam.name}<small>${s.name} ${FRAME_NOTE[state.frame]} · CR3BP model, not mission-grade</small>`;
+  setTitle(p ? p.title : fam.name, `${s.name} ${FRAME_NOTE[state.frame]} · CR3BP model, not mission-grade`);
   $("member-label").textContent = p && state.memberIdx < 0 ? "preset" : `${state.memberIdx + 1} / ${state.members.length}`;
   for (const btn of presets.querySelectorAll("button")) btn.setAttribute("aria-pressed", String(btn.dataset.slug === p?.slug));
 }
@@ -407,7 +496,7 @@ $<HTMLSelectElement>("center").onchange = (e) => { state.center = (e.target as H
 for (const id of ["show-family", "big-bodies"]) $(id).onchange = () => rebuild(false);
 $("show-lpts").onchange = (e) => { lptGroup.visible = (e.target as HTMLInputElement).checked; invalidate(); };
 $("show-labels").onchange = (e) => { labels.domElement.style.display = (e.target as HTMLInputElement).checked ? "" : "none"; invalidate(); };
-for (const b of $("views").querySelectorAll("button")) (b as HTMLButtonElement).onclick = () => fitCamera((b as HTMLButtonElement).dataset.view as "top");
+for (const b of $("views").querySelectorAll("button")) (b as HTMLButtonElement).onclick = () => fitCamera((b as HTMLButtonElement).dataset.view as View);
 
 // play / pause (starts paused when the system asks for reduced motion)
 const playBtn = $<HTMLButtonElement>("play");
@@ -464,9 +553,8 @@ async function setMode(m: Mode) {
   planner?.show(m === "planner");
   coverage?.show(m === "coverage");
   if (viewerOn) { renderInfo(); fitCamera(state.view); }
-  else $("title").innerHTML = m === "planner"
-    ? `Transfer planner<small>Earth-Moon rotating frame · routes from cited delta-v tables</small>`
-    : `Coverage<small>Share of one month each region is in view · Earth-Moon rotating frame</small>`;
+  else if (m === "planner") setTitle("Transfer planner", "Earth-Moon rotating frame · routes from cited delta-v tables");
+  else setTitle("Coverage", "Share of one month each region is in view · Earth-Moon rotating frame");
   const url = new URL(location.href);
   if (m === "viewer") url.searchParams.delete("mode"); else url.searchParams.set("mode", m);
   history.replaceState(null, "", url);
@@ -513,6 +601,9 @@ function applySize(w: number, h: number) {
     if (mode === "viewer") { if (state.current) fitCamera(state.view); }
     else if (mode === "planner") planner?.show(true);
     else coverage?.show(true);
+  } else if (compactMQ.matches && lastFit) {
+    // phones: re-frame after rotation or a resize, keeping the angle the user turned to
+    fitTo(lastFit.points, lastFit.view, { ...lastFit.opts, keepDir: true });
   }
   invalidate();
 }
@@ -547,11 +638,11 @@ function updateScaleBar() {
   const pxPerUnit = viewH / 2 / (dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)));
   const kmPerUnit = s.lunit_km / S;
   const spanKm = (viewW / pxPerUnit) * kmPerUnit;
-  const bar = niceKm(spanKm);
+  const bar = niceKm(compactMQ.matches ? spanKm / 2.5 : spanKm); // phones: a short bar, clear of the view buttons
   const w = `${Math.round((bar / kmPerUnit) * pxPerUnit)}px`;
-  const text = `${bar.toLocaleString("en-US")} km at view center`;
+  const text = `${bar.toLocaleString("en-US")} km`;
   if (w !== lastBarW) { scaleBar.style.width = w; lastBarW = w; }
-  if (text !== lastBarText) { scaleText.textContent = text; lastBarText = text; }
+  if (text !== lastBarText) { scaleText.innerHTML = `${text}<span class="narrow-hide"> at view center</span>`; lastBarText = text; }
 }
 
 function tick(now: number) {
@@ -572,6 +663,7 @@ function tick(now: number) {
     dirty = false;
     renderer.render(scene, camera);
     labels.render(scene, camera);
+    hideCoveredLabels();
     updateScaleBar();
   }
   // keep looping only while something moves (playing, or the camera is still damping)
@@ -587,13 +679,56 @@ const startSlug = location.hash.slice(1);
 const start = index.key_orbits.find(k => k.slug === startSlug) ?? index.key_orbits.find(k => k.slug === "09-nrho-9-2")!;
 selectPreset(start);
 const ctx: Ctx = {
-  S, em: index.systems["earth-moon"], world, keyOrbits: index.key_orbits, v3, label, clearGroup, fitTo,
+  S, em: index.systems["earth-moon"], world, keyOrbits: index.key_orbits, v3, label, clearGroup,
+  fitTo: (points, view, o = {}) => { if (!o.phoneOnly || compactMQ.matches) fitTo(points, view, { extra: o.extra, labelRoom: o.labelRoom }); },
   lineResolution: () => ({ w: viewW, h: viewH }),
   onResize: fn => { resizeFns.push(fn); },
   invalidate,
 };
+compactMQ.addEventListener("change", () => { if (lastFit) fitTo(lastFit.points, lastFit.view, { ...lastFit.opts, keepDir: true }); });
 planner = initPlanner(ctx, transfers);
 coverage = initCoverage(ctx, sda);
 const startMode = parseMode(new URL(location.href).searchParams.get("mode"));
 if (startMode !== "viewer") setTimeout(() => void setMode(startMode), 300);
 invalidate();
+
+// Verification hook, only in `vite build --mode fitcheck` builds (stripped from normal builds):
+// projects every drawn path tagged with userData.fitcheck to stage pixels so a browser test can
+// check it stays inside the clear area.
+if (import.meta.env.MODE === "fitcheck") {
+  (window as unknown as { __fit: unknown }).__fit = {
+    sample() {
+      renderer.render(scene, camera);
+      labels.render(scene, camera);
+      hideCoveredLabels();
+      scene.updateMatrixWorld(true);
+      const sets: Record<string, number[][]> = {};
+      const v = new THREE.Vector3();
+      const visible = (o: THREE.Object3D | null): boolean => { for (; o; o = o.parent) if (!o.visible) return false; return true; };
+      world.traverse(o => {
+        const tag = o.userData.fitcheck as string | undefined;
+        if (!tag || !visible(o)) return;
+        const g = (o as THREE.Mesh).geometry as THREE.BufferGeometry | undefined;
+        const out = (sets[tag] ||= []);
+        const push = () => { v.applyMatrix4(o.matrixWorld).project(camera); out.push([(v.x + 1) / 2 * viewW, (1 - v.y) / 2 * viewH, v.z]); };
+        const start = g?.getAttribute("instanceStart") as THREE.InterleavedBufferAttribute | undefined;
+        const end = g?.getAttribute("instanceEnd") as THREE.InterleavedBufferAttribute | undefined;
+        if (start && end) {
+          for (let i = 0; i < start.count; i++) { v.set(start.getX(i), start.getY(i), start.getZ(i)); push(); }
+          if (end.count) { const i = end.count - 1; v.set(end.getX(i), end.getY(i), end.getZ(i)); push(); }
+        } else if (g?.getAttribute("position")) {
+          const pos = g.getAttribute("position");
+          for (let i = 0; i < pos.count; i++) { v.set(pos.getX(i), pos.getY(i), pos.getZ(i)); push(); }
+        } else { v.set(0, 0, 0); push(); }
+      });
+      // the region the last fit framed (the coverage grid's corners, the route, the orbit)
+      sets.frame = (lastFit?.points ?? []).map(p => { v.copy(p).applyMatrix4(world.matrixWorld).project(camera); return [(v.x + 1) / 2 * viewW, (1 - v.y) / 2 * viewH, v.z]; });
+      const sr = stage.getBoundingClientRect();
+      const labelRects = [...labels.domElement.children as HTMLCollectionOf<HTMLElement>]
+        .filter(el => el.style.display !== "none" && el.style.visibility !== "hidden" && el.textContent)
+        .map(el => { const r = el.getBoundingClientRect(); return { text: el.textContent, left: r.left - sr.left, top: r.top - sr.top, right: r.right - sr.left, bottom: r.bottom - sr.top }; });
+      const rel = (r: DOMRect) => ({ left: r.left - sr.left, top: r.top - sr.top, right: r.right - sr.left, bottom: r.bottom - sr.top });
+      return { stage: { w: viewW, h: viewH }, clear: measureClear(), overlays: overlayRects.map(rel), sets, labels: labelRects };
+    },
+  };
+}

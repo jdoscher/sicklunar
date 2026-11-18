@@ -35,6 +35,8 @@ a { color: var(--trace); }
 .btn[disabled] { color: var(--ink-3); border-style: dashed; cursor: not-allowed; background: transparent; }
 .why { display: inline-flex; align-items: center; gap: 6px; min-height: var(--tap); padding: 0 var(--s-3); border-radius: var(--r-2); border: 1px solid var(--rule-strong); background: transparent; color: var(--trace); font-family: var(--font-display); font-weight: 600; font-size: 15px; cursor: pointer; flex: none; }
 .why:hover { background: var(--plate-2); }
+.cap-acts { display: flex; gap: var(--s-2); flex: none; }
+.why.more { display: none; color: var(--ink-2); font-size: 14px; padding: 0 10px; }
 button.term { all: unset; cursor: pointer; color: var(--trace); border-bottom: 1.5px dotted var(--trace); }
 button.term:focus-visible { box-shadow: var(--focus); border-radius: 2px; }
 .seg { display: inline-flex; border: 1px solid var(--rule-strong); border-radius: var(--r-2); overflow: hidden; background: var(--scrim); }
@@ -420,46 +422,87 @@ body.reduce-motion *, body.reduce-motion *::before, body.reduce-motion *::after 
   .stage-hint, .pin-legend { display: none; }
   .label3d.lunar:not(.on), .label3d.site:not(.on) { font-size: 0; padding: 0; }
 
-  .hud-top { padding: var(--s-3) var(--s-3) var(--s-6); flex-direction: column; gap: var(--s-2); }
-  .clock .label { display: none; }
-  .clock .num { font-size: 28px; }
-  .clock .date { margin-top: 2px; font-size: 13px; }
-  .readouts { margin-top: var(--s-2); }
-  .readouts > div { padding: 0 var(--s-3); }
-  .readouts .num { font-size: 16px; }
-  .readouts .label { font-size: 11px; letter-spacing: .06em; }
-  .hud-right { position: absolute; right: var(--s-3); top: var(--s-3); }
-  .hud-ctrls .seg button { padding: 0 10px; font-size: 0; gap: 0; }
-  .hud-ctrls .seg button svg { width: 20px; height: 20px; }
-  .hud-ctrls .btn span { display: none; }
-  .hud-ctrls .btn { width: var(--tap); padding: 0; }
-  .view-badge { display: none !important; }
-  .burn-banner { top: auto; bottom: 230px; font-size: 13px; max-width: calc(100% - 24px); white-space: normal; text-align: center; }
-  .hud-bottom { left: var(--s-2); right: var(--s-2); bottom: calc(var(--s-2) + env(safe-area-inset-bottom)); grid-template-columns: 1fr; gap: var(--s-2); }
-  .hud-gap { display: none; }
-  .panel { padding: var(--s-3); }
-  .caption .title { font-size: 20px; }
-  .caption p { font-size: 15px; margin-top: 4px; }
-  .caption .label { margin-bottom: 4px; font-size: 12px; }
-  .fuel { order: -1; padding: var(--s-2) var(--s-3); }
-  .fuel .row { margin-bottom: 6px; } .fuel .num { font-size: 16px; } .fuel .next { display: none; } .fuel .gauge { height: 8px; }
-  .strip { grid-template-columns: 48px 1fr auto; padding: 6px 8px; gap: var(--s-2); }
-  .strip .speed button { padding: 0 8px; min-width: 40px; }
-  .strip .speed button[data-speed="2"] { display: none; }
-  .phases div span { display: none; }
-  .phases div.now span { display: block; position: absolute; left: 0; top: 10px; overflow: visible; }
-  .phases { padding-bottom: 22px; }
-  body.caption-min .caption p { display: none; }
-  .endcard { left: var(--s-2); right: var(--s-2); width: auto; bottom: calc(84px + env(safe-area-inset-bottom)); max-height: calc(100% - 200px); grid-template-columns: 1fr; gap: var(--s-3); padding: var(--s-4); }
-  .patch { width: 96px; height: 96px; }
-  .endcard .hero { font-size: 30px; }
-  .endcard p { font-size: var(--t-body); }
-  .stats { gap: var(--s-4); margin: var(--s-3) 0; }
-  .stats .num { font-size: 20px; }
-  .actions { flex-direction: column; } .actions .btn { width: 100%; }
   .briefing { padding: var(--s-5) var(--s-4); }
   .briefing h2 { font-size: 28px; }
   .choices { grid-template-columns: 1fr; }
   .choice { min-height: 0; }
   .modal { padding: var(--s-5) var(--s-4); }
+}
+
+/* ---- flight HUD on phones (portrait < 820px wide, and landscape phones): give the paths room ---- */
+@media (max-width: 819px), (max-height: 500px) {
+  .label3d.lunar:not(.on), .label3d.site:not(.on) { font-size: 0; padding: 0; }
+  /* top band: clock (+ date) and the view / camera / plan buttons on one row, readouts on one line */
+  .hud-top { padding: var(--s-2) max(var(--s-3), env(safe-area-inset-right)) var(--s-5) max(var(--s-3), env(safe-area-inset-left)); flex-direction: column; gap: 0; }
+  .tele { width: 100%; }
+  .clock { min-height: var(--tap); display: flex; flex-direction: column; justify-content: center; }
+  .clock .label { display: none; }
+  .clock .num { font-size: 24px; }
+  .clock .date { margin-top: 2px; font-size: 12px; line-height: 1.2; }
+  .readouts { margin-top: var(--s-1); white-space: nowrap; }
+  .readouts > div { display: flex; align-items: baseline; gap: 5px; padding: 0 var(--s-2); }
+  .readouts .label { font-size: 10px; letter-spacing: .06em; margin: 0; color: var(--ink-3); }
+  .readouts .label .lf { display: none; }
+  .readouts .num { font-size: 15px; line-height: 1.2; }
+  .readouts .num small { font-size: 11px; margin-left: 2px; }
+  .hud-right { position: absolute; right: max(var(--s-3), env(safe-area-inset-right)); top: var(--s-2); }
+  .hud-ctrls { flex-wrap: nowrap; gap: 6px; }
+  .hud-ctrls .seg button { padding: 0 10px; font-size: 0; gap: 0; }
+  .hud-ctrls .seg button svg { width: 20px; height: 20px; }
+  .hud-ctrls .btn span { display: none; }
+  .hud-ctrls .btn { width: var(--tap); padding: 0; }
+  .view-badge { display: none !important; }
+  /* burn toast: in the top band, over the readouts line */
+  .burn-banner { top: var(--burn-top, 64px); transform: translate(-50%, -50%); font-size: 12px; padding: 5px 10px; max-width: calc(100% - 16px); overflow: hidden; text-overflow: ellipsis; }
+  /* bottom: caption (title + Why? + More), then one card with a thin fuel bar over the timeline */
+  .hud-bottom { left: max(var(--s-2), env(safe-area-inset-left)); right: max(var(--s-2), env(safe-area-inset-right)); bottom: calc(var(--s-2) + env(safe-area-inset-bottom)); grid-template-columns: 1fr; gap: 0; }
+  .hud-gap { display: none; }
+  .panel { padding: var(--s-2) var(--s-3); }
+  .caption { margin-bottom: var(--s-2); }
+  .caption .top { align-items: center; gap: var(--s-2); }
+  .caption .top > div:first-child { min-width: 0; }
+  .caption .label { margin-bottom: 2px; font-size: 11px; }
+  .caption .title { font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .caption p { font-size: 15px; margin-top: 4px; }
+  .why { padding: 0 10px; }
+  .why.more { display: inline-flex; }
+  body:not(.cap-open) #cap-text { display: none; }
+  .fuel { order: 1; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; padding: 6px var(--s-3) 2px; border-bottom: 0; border-radius: var(--r-3) var(--r-3) 0 0; }
+  .fuel .row { display: contents; }
+  .fuel .row .label { grid-column: 1; grid-row: 1; font-size: 11px; }
+  .fuel .row .num { grid-column: 3; grid-row: 1; font-size: 14px; }
+  .fuel .row .num small { font-size: 12px; }
+  .fuel .gauge { grid-column: 2; grid-row: 1; height: 8px; }
+  .fuel .next { display: none; }
+  .strip { order: 2; grid-template-columns: 48px 1fr auto; padding: 4px 8px 6px; gap: var(--s-2); border-top: 0; border-radius: 0 0 var(--r-3) var(--r-3); }
+  .strip .speed button { padding: 0 8px; min-width: 40px; }
+  .strip .speed button[data-speed="2"] { display: none; }
+  .phases div span { display: none; }
+  .phases div.now span { display: block; position: absolute; left: 0; top: 10px; overflow: visible; }
+  .phases { padding-bottom: 22px; }
+  /* end card: a bottom sheet over the timeline, at most half the stage so the Moon stays in view */
+  .endcard { left: max(var(--s-2), env(safe-area-inset-left)); right: max(var(--s-2), env(safe-area-inset-right)); width: auto; bottom: calc(80px + env(safe-area-inset-bottom)); max-height: 48%; grid-template-columns: 1fr; gap: var(--s-2); padding: var(--s-3) var(--s-4); }
+  .patch { display: none; }
+  .endcard .hero { font-size: 26px; margin: var(--s-1) 0 var(--s-2); }
+  .endcard p { font-size: 15px; }
+  .stats { gap: var(--s-4); margin: var(--s-2) 0; padding: var(--s-2) 0; }
+  .stats .label { margin-bottom: 4px; }
+  .stats .num { font-size: 18px; }
+  .actions { gap: var(--s-2); } .actions .btn { flex: 1 1 auto; min-height: var(--tap); padding: 0 var(--s-3); font-size: 15px; }
+}
+@media (max-width: 389px) {
+  .readouts > div { padding: 0 6px; gap: 4px; }
+  .readouts .label { font-size: 9px; letter-spacing: .04em; }
+  .readouts .num { font-size: 14px; }
+  .readouts .num small { font-size: 10px; }
+}
+/* landscape phones: clock and readouts on one row; caption beside the fuel + timeline card */
+@media (max-height: 500px) {
+  .tele { display: flex; align-items: center; gap: var(--s-4); width: auto; }
+  .readouts { margin-top: 0; }
+  .hud-bottom { grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); column-gap: var(--s-2); }
+  .caption { grid-column: 1; grid-row: 1 / span 2; align-self: end; margin-bottom: 0; }
+  .fuel { grid-column: 2; grid-row: 1; }
+  .strip { grid-column: 2; grid-row: 2; }
+  .endcard { right: auto; width: calc((100% - 24px) / 2.3); bottom: calc(var(--s-2) + env(safe-area-inset-bottom)); max-height: calc(100% - 68px); }
 }

@@ -13,7 +13,11 @@ export interface Ctx {
   v3(p: Vec3): THREE.Vector3;
   label(text: string, cls?: string): CSS2DObject;
   clearGroup(g: THREE.Object3D): void;
-  fitTo(points: THREE.Vector3[], view?: "top" | "side" | "front" | "iso"): void;
+  /** Frame the points. On phones the view is framed inside the clear area between the scene
+   *  title and the toolbar, and `extra` points (context such as orbits at the route's stops) are
+   *  framed too. `phoneOnly` skips the fit on wider screens; `labelRoom` keeps that many px free
+   *  on the right on phones for labels that sit right of their points. */
+  fitTo(points: THREE.Vector3[], view?: "top" | "side" | "front" | "iso", opts?: FitOpts): void;
   /** Stage size in CSS px (cached; reading it never forces a layout). */
   lineResolution(): { w: number; h: number };
   /** Called whenever the stage is resized. */
@@ -21,6 +25,8 @@ export interface Ctx {
   /** Ask for a redraw: the scene only renders when something changed. */
   invalidate(): void;
 }
+
+export interface FitOpts { extra?: THREE.Vector3[]; phoneOnly?: boolean; labelRoom?: number }
 
 export const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 

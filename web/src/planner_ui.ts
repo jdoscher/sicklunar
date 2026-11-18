@@ -80,6 +80,7 @@ export function initPlanner(ctx: Ctx, data: Transfers) {
     routeMats.length = 0;
     const used = new Set<string>(route ? route.legs.flatMap(l => [l.from, l.to]) : [from.value, to.value]);
     const all: THREE.Vector3[] = [];
+    const extra: THREE.Vector3[] = []; // orbits of the stops on the route: framed too on phones
     // nodes
     for (const [id, g] of Object.entries(geom)) {
       if (id === "cycler31") continue;
@@ -89,6 +90,7 @@ export function initPlanner(ctx: Ctx, data: Transfers) {
         const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(g.orbit.map(ctx.v3)),
           new THREE.LineBasicMaterial({ color, transparent: true, opacity: on ? 0.9 : 0.5 }));
         group.add(line);
+        if (on) { line.userData.fitcheck = "route"; extra.push(...g.orbit.map(ctx.v3)); }
       }
       if (g.ring) {
         const pts: THREE.Vector3[] = [];
@@ -103,6 +105,7 @@ export function initPlanner(ctx: Ctx, data: Transfers) {
         new THREE.PointsMaterial({ color: on ? 0xf3f5f8 : 0x646f82, size: on ? 7 : 4, sizeAttenuation: false }),
       );
       dot.position.copy(ctx.v3(g.anchor)); // labels follow the object position, not the vertex
+      if (on) dot.userData.fitcheck = "route";
       if (on) {
         const [txt, dx, dy] = SHORT[id] ?? [nodeName(id), 10, 0];
         const lab = ctx.label(txt, "craft");
@@ -130,7 +133,9 @@ export function initPlanner(ctx: Ctx, data: Transfers) {
         const mat = new LineMaterial({ color: i % 2 ? 0x7ad4ff : 0xf3f5f8, linewidth: 3, worldUnits: false });
         mat.resolution.set(w, h);
         routeMats.push(mat);
-        group.add(new Line2(g, mat));
+        const leg = new Line2(g, mat);
+        leg.userData.fitcheck = "route";
+        group.add(leg);
         // arrow head at the end
         const tan = curve.getTangent(0.97).normalize();
         const cone = new THREE.Mesh(new THREE.ConeGeometry(0.6, 1.8, 12), new THREE.MeshBasicMaterial({ color: mat.color }));
@@ -141,7 +146,7 @@ export function initPlanner(ctx: Ctx, data: Transfers) {
         pts.forEach(p => all.push(p));
       });
     }
-    if (all.length) ctx.fitTo(all, "iso");
+    if (all.length) ctx.fitTo(all, "iso", { extra, labelRoom: 44 });
     ctx.invalidate();
   }
 

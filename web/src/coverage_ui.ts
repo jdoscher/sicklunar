@@ -73,7 +73,7 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
     b.onclick = () => {
       for (const s of SENSORS) counts[s.id] = p.set[s.id] ?? 0;
       for (const o of presetBox.querySelectorAll("button")) o.setAttribute("aria-pressed", String(o === b));
-      syncSelects(); drawSensors(); run();
+      syncSelects(); drawSensors(); frame(true); run();
     };
     b.dataset.preset = k;
     presetBox.appendChild(b);
@@ -91,8 +91,10 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
     s.oninput = upd; upd();
   }
 
+  let fitPts: THREE.Vector3[] = []; // sensor orbits, added to the framing on phones
   function drawSensors() {
     ctx.clearGroup(sensorGroup);
+    fitPts = [];
     for (const s of SENSORS) {
       const n = counts[s.id] ?? 0;
       if (!n || s.kind === "ground") continue;
@@ -103,6 +105,8 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
         pts = ko(s.slug!).points.map(p => (s.mirrorY ? [p[0], -p[1], p[2]] : p) as Vec3);
       }
       const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts.map(ctx.v3)), new THREE.LineBasicMaterial({ color: 0xf3f5f8, transparent: true, opacity: 0.75 }));
+      line.userData.fitcheck = "sensor";
+      fitPts.push(...pts.map(ctx.v3));
       const tip = new THREE.Object3D();
       tip.position.copy(ctx.v3(pts[0]));
       const lab = ctx.label(`${s.name}${n > 1 ? " × " + n : ""}`, "craft");
@@ -111,6 +115,11 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
       sensorGroup.add(line, tip);
     }
     ctx.invalidate();
+  }
+
+  /** Frame the coverage grid (and, on phones, the sensors' orbits). Preset changes only re-frame on phones. */
+  function frame(phoneOnly: boolean) {
+    ctx.fitTo([ctx.v3([-0.3, -0.8, 0]), ctx.v3([1.35, 0.8, 0])], "top", { extra: fitPts, phoneOnly });
   }
 
   function render(positions: Float32Array, coverage: Float32Array) {
@@ -133,7 +142,9 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     geo.setAttribute("color", new THREE.BufferAttribute(col, 4));
-    heat.add(new THREE.Points(geo, new THREE.PointsMaterial({ size: planeOnly ? 9 : 6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false })));
+    const cells = new THREE.Points(geo, new THREE.PointsMaterial({ size: planeOnly ? 9 : 6, sizeAttenuation: false, vertexColors: true, transparent: true, depthWrite: false }));
+    cells.userData.fitcheck = "heat";
+    heat.add(cells);
     ctx.invalidate();
   }
   $("cv-plane").addEventListener("change", () => { if (lastPositions && lastCoverage) render(lastPositions, lastCoverage); });
@@ -194,7 +205,7 @@ export function initCoverage(ctx: Ctx, sda: SdaData) {
       group.visible = on;
       if (on) {
         drawSensors();
-        ctx.fitTo([ctx.v3([-0.3, -0.8, 0]), ctx.v3([1.35, 0.8, 0])], "top");
+        frame(false);
         if (!lastCoverage) run();
       }
     },

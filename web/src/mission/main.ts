@@ -8,6 +8,7 @@ import "../site/base";
 import "../site/nav";
 import "./mission.css";
 import { icon, mountSprite } from "./icons";
+import { clearArea, distToContain, focalPx, viewOffset, type P3, type Rect } from "../fit";
 import { loadFlight, loadPlanningData } from "./data";
 import { CHALLENGES, DESTINATIONS, GLOSSARY, PHASES, SITE_LESSON, type Challenge, type DestId, type PhaseId } from "./content";
 import {
@@ -880,6 +881,14 @@ $("back-plan").onclick = () => stopMission();
 for (const b of $("view-seg").querySelectorAll<HTMLElement>("button")) b.onclick = () => { viewMode = b.dataset.view as ViewMode; lastRotKey = NaN; };
 $("cam-auto").onclick = () => { autoCam = !autoCam; $("cam-auto").classList.toggle("on", autoCam); $("cam-auto").setAttribute("aria-pressed", String(autoCam)); };
 $("play").onclick = () => togglePlay();
+// phones: the caption shows its title and Why? until More is tapped (the live region still reads it all)
+$("cap-more").onclick = () => {
+  const open = !document.body.classList.contains("cap-open");
+  document.body.classList.toggle("cap-open", open);
+  $("cap-more").setAttribute("aria-expanded", String(open));
+  $("cap-more").textContent = open ? "Less" : "More";
+  layoutHud();
+};
 function togglePlay() {
   if (!mission) return;
   if (wall >= endWall() - 1e-6) { replay(); return; }
@@ -965,6 +974,7 @@ async function startMission() {
   $("hud").hidden = false;
   $("endcard").hidden = true;
   pinGroup.visible = false;
+  camAnim = null; // a planning camera move still running would hold the auto camera off the craft
   W = totalWall(mission.segments);
   wall = 0; playing = true; lastPhaseKey = ""; lastEventIdx = -1;
   focusSegName = ""; lastSeg = null; prevFocus = null; lastAngle = null;
@@ -1187,11 +1197,17 @@ function updateCaption(t: number) {
   layoutHud();
 }
 
+/** Phones (portrait and landscape): compact flight HUD, framed from the overlays' real boxes. */
+const compactMQ = matchMedia("(max-width: 819px), (max-height: 500px)");
+let clearRect: Rect | null = null; // clear area of the stage on phones (stage px), null on wide screens
+
 /** Keep the spacecraft in the clear area between the top readouts and the bottom panels on any aspect. */
 function layoutHud() {
   if (!flying) return;
   const w = stage.clientWidth, h = stage.clientHeight;
   const sr = stage.getBoundingClientRect();
+  if (compactMQ.matches) { layoutHudCompact(w, h, sr); return; }
+  clearRect = null;
   const topEl = document.querySelector(".tele") as HTMLElement;
   const botEl = !$("endcard").hidden ? $("endcard") : $("hud-bottom");
   const freeTop = Math.max(0, topEl.getBoundingClientRect().bottom - sr.top + 8);
@@ -1203,6 +1219,43 @@ function layoutHud() {
   fitK = Math.min(3, Math.max(1, (h * 0.8) / freeH));
   aspK = Math.min(2.2, Math.max(1, 1.5 / (w / freeH)));
   invalidate();
+}
+
+function layoutHudCompact(w: number, h: number, sr: DOMRect) {
+  const shown = (el: Element | null): el is HTMLElement => !!el && (el as HTMLElement).offsetParent !== null && getComputedStyle(el).visibility !== "hidden" && el.getBoundingClientRect().height > 0;
+  const tops: number[] = [], bottoms: number[] = [];
+  for (const el of [document.querySelector(".tele"), document.querySelector(".hud-ctrls")]) if (shown(el)) tops.push(el.getBoundingClientRect().bottom - sr.top);
+  const card = $("endcard");
+  const cr = card.hidden ? null : card.getBoundingClientRect();
+  const sideCard = !!cr && cr.width < w * 0.65; // landscape: the end card sits beside the clear area
+  const lows = cr && !sideCard ? [card, document.querySelector(".strip")] : [...$("hud-bottom").children];
+  for (const el of lows) if (shown(el)) bottoms.push(el.getBoundingClientRect().top - sr.top);
+  clearRect = clearArea(w, h, tops, bottoms, 100);
+  if (cr && sideCard) clearRect.left = Math.min(w - 100, cr.right - sr.left + 8);
+  const off = viewOffset(w, h, clearRect);
+  camera.setViewOffset(w, h, off.x, off.y, w, h);
+  const freeH = clearRect.bottom - clearRect.top;
+  fitK = Math.min(3, Math.max(1, (h * 0.8) / freeH));
+  aspK = Math.min(2.2, Math.max(1, 1.5 / (w / freeH)));
+  // the burn toast sits over the readouts line, in the top band, not over the paths
+  const ro = $("stats").getBoundingClientRect();
+  $("burn-banner").style.setProperty("--burn-top", `${Math.max(4, ro.top - sr.top + ro.height / 2)}px`);
+  invalidate();
+}
+
+/** Phones: zoom out just enough that the spacecraft, the path next to it and the focused body
+ *  project inside the clear area (the auto camera's distance is only a starting point there). */
+const camRight = new THREE.Vector3(), camUp = new THREE.Vector3(), camBack = new THREE.Vector3(), rel = new THREE.Vector3();
+function keepInClear(points: THREE.Vector3[]) {
+  if (!clearRect) return;
+  camBack.subVectors(camera.position, controls.target);
+  const dist = camBack.length();
+  camBack.normalize();
+  camRight.crossVectors(camera.up, camBack).normalize();
+  camUp.crossVectors(camBack, camRight);
+  const pts: P3[] = points.map(p => { rel.subVectors(p, controls.target); return [rel.dot(camRight), rel.dot(camUp), rel.dot(camBack)]; });
+  const need = distToContain(pts, focalPx(camera.fov, stage.clientHeight), clearRect, 18, dist);
+  if (need > dist) camera.position.copy(controls.target).addScaledVector(camBack, need);
 }
 
 // ------------------------------------------------------------ first-run briefing + quick launch coach marks
@@ -1447,7 +1500,7 @@ function frame(now: number) {
     const c2 = m.craft(t + 60);
     const speed = Math.hypot(c2[0] - c[0], c2[1] - c[1], c2[2] - c[2]) / 60;
     const dE = Math.hypot(...c), dM = Math.hypot(c[0] - mp[0], c[1] - mp[1], c[2] - mp[2]);
-    $("stats").innerHTML = `<div><div class="label">Speed</div><div class="num">${speed.toFixed(2)}<small>km/s</small></div></div><div><div class="label">From Earth</div><div class="num">${Math.round(dE).toLocaleString("en-US")}<small>km</small></div></div><div><div class="label">From Moon</div><div class="num">${Math.round(dM).toLocaleString("en-US")}<small>km</small></div></div>`;
+    $("stats").innerHTML = `<div><div class="label">Speed</div><div class="num">${speed.toFixed(2)}<small>km/s</small></div></div><div><div class="label"><span class="lf">From </span>Earth</div><div class="num">${Math.round(dE).toLocaleString("en-US")}<small>km</small></div></div><div><div class="label"><span class="lf">From </span>Moon</div><div class="num">${Math.round(dM).toLocaleString("en-US")}<small>km</small></div></div>`;
     updateCaption(t);
     updateStrip();
     const st = `Day ${Math.floor(t / 86400) + 1}, ${$("cap-title").textContent || ""}`;
@@ -1489,6 +1542,16 @@ function frame(now: number) {
       }
       const curD = camera.position.distanceTo(controls.target);
       camera.position.copy(controls.target).add(dir.multiplyScalar(curD + (dist - curD) * kk));
+      if (clearRect) {
+        // the craft, a little of the path either side of it, and the body in focus
+        const keep = [cp];
+        const pa = (pathFuture.geometry.attributes.position as THREE.BufferAttribute).array as Float32Array;
+        for (const j of [k - 12, k - 4, k + 4, k + 12]) if (j >= 0 && 3 * j + 2 < pa.length) keep.push(new THREE.Vector3(pa[3 * j], pa[3 * j + 1], pa[3 * j + 2]));
+        // the focus body once the camera has finished moving to it (mid-move the old focus holds the view)
+        if (ww > 0.999 && (seg.focus === "earth" || seg.focus === "both")) keep.push(new THREE.Vector3());
+        if (ww > 0.999 && (seg.focus === "moon" || seg.focus === "both")) keep.push(v3(mp));
+        keepInClear(keep);
+      }
     }
   }
   if (camAnim) {
@@ -1562,3 +1625,26 @@ refresh();
 if (state.dest === "surface") focusLanding(); else focusSite();
 requestAnimationFrame(frame);
 if (!localStorage.getItem("cislunar-onboarded")) openBriefing();
+
+// Verification hook, only in `vite build --mode fitcheck` builds (stripped from normal builds):
+// samples the spacecraft's screen position during playback against the phone clear area.
+if (import.meta.env.MODE === "fitcheck") {
+  let timer = 0;
+  let samples: { wall: number; x: number; y: number; seg: string; clear: Rect | null }[] = [];
+  const v = new THREE.Vector3();
+  (window as unknown as { __flight: unknown }).__flight = {
+    start(ms = 500) {
+      samples = [];
+      clearInterval(timer);
+      timer = window.setInterval(() => {
+        if (!mission) return;
+        const t = wallToMission(mission.segments, wall);
+        v.copy(v3(mission.craft(t))).project(camera);
+        const w = stage.clientWidth, h = stage.clientHeight;
+        samples.push({ wall, x: (v.x + 1) / 2 * w, y: (1 - v.y) / 2 * h, seg: segmentAt(mission.segments, t).name, clear: clearRect });
+      }, ms);
+    },
+    stop() { clearInterval(timer); return samples; },
+    state() { return { wall, end: endWall(), playing, flying }; },
+  };
+}
