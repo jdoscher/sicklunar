@@ -1,0 +1,16 @@
+Sicklunar lesson text and compiled data
+Copyright (c) 2026 Jay Doscher
+
+The following are licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0), https://creativecommons.org/licenses/by/4.0/
+
+- the lesson text of the website: web/src/mission/content.ts and the text of
+  web/index.html, web/about.html and web/teachers.html
+- the compiled research tables in cislunar/research_data/*.json
+
+Credit "Sicklunar (sicklunar.com), Jay Doscher" and link to the licence.
+
+Facts are not copyrightable; the sources cited inside each data record keep
+their own terms. Program code is under the MIT License (see LICENSE). NASA
+images are public domain (see CREDITS.md). Fonts are under the SIL Open Font
+License 1.1 (see their packages).

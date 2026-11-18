@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>About, privacy and credits · Sicklunar</title>
+<meta name="description" content="Who makes Sicklunar, what it stores (nothing about you), how accurate its three-body paths are, and the NASA, JPL and research sources it is built on." />
+<link rel="canonical" href="https://sicklunar.com/about" />
+<meta name="theme-color" content="#04060A" />
+<meta name="color-scheme" content="dark" />
+<link rel="icon" href="/favicon.ico?v=1" sizes="32x32" />
+<link rel="icon" href="/favicon.svg?v=1" type="image/svg+xml" />
+<link rel="icon" href="/favicon-32.png?v=1" type="image/png" sizes="32x32" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?v=1" />
+<link rel="manifest" href="/site.webmanifest?v=1" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Sicklunar" />
+<meta property="og:url" content="https://sicklunar.com/about" />
+<meta property="og:title" content="About, privacy and credits · Sicklunar" />
+<meta property="og:description" content="A free, open-source way to explore the space between Earth and the Moon. No accounts, cookies or tracking. Built on NASA and JPL data." />
+<meta property="og:image" content="https://sicklunar.com/og-image.png?v=1" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="The Sicklunar logo and a crescent Moon with the words Real paths between Earth and the Moon" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="About, privacy and credits · Sicklunar" />
+<meta name="twitter:description" content="A free, open-source way to explore the space between Earth and the Moon. No accounts, cookies or tracking. Built on NASA and JPL data." />
+<meta name="twitter:image" content="https://sicklunar.com/og-image.png?v=1" />
+<meta name="twitter:image:alt" content="The Sicklunar logo and a crescent Moon with the words Real paths between Earth and the Moon" />
+</head>
+<body class="about">
+<header id="site-nav" data-page="about"></header>
+
+<main id="main">
+  <div class="page-head">
+    <p class="label kicker">About Sicklunar</p>
+    <h1>A free way to explore the space between Earth and the Moon.</h1>
+    <p class="lede">Sicklunar lets you plan a trip to the Moon and watch it fly on paths worked out with real gravity. It’s made for curious people aged about 10 to 18, their teachers and parents, and anyone who likes space.</p>
+  </div>
+
+  <div class="page">
+    <nav class="toc" aria-labelledby="toc-title">
+      <h2 id="toc-title">On this page</h2>
+      <ol>
+        <li><a href="#about"><span class="num" aria-hidden="true">01</span>About</a></li>
+        <li><a href="#privacy"><span class="num" aria-hidden="true">02</span>Privacy</a></li>
+        <li><a href="#accuracy"><span class="num" aria-hidden="true">03</span>How accurate is it?</a></li>
+        <li><a href="#credits"><span class="num" aria-hidden="true">04</span>Credits and sources</a></li>
+        <li><a href="#licence"><span class="num" aria-hidden="true">05</span>Licence</a></li>
+        <li><a href="#contact"><span class="num" aria-hidden="true">06</span>Contact</a></li>
+      </ol>
+    </nav>
+
+    <article class="prose">
+      <section id="about" aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <p>The name is a play on <b>cislunar</b> (say “sis-LOO-nar”), the word for the space between Earth and the Moon. A sickle is also the shape of a thin crescent Moon.</p>
+        <p>There are two parts. The <a href="/mission">Mission planner</a> walks you through a trip one choice at a time: where to go, which launch pad, which day and which fuel tank. Then it flies the trip and explains every engine burn. The <a href="/lab">Orbit lab</a> is the more technical tool behind it, for exploring real orbit families, routes between them and where telescopes could watch the space around the Moon.</p>
+        <h3>Who made it</h3>
+        <p>Sicklunar was created by <a href="https://doscher.com"><b>Jay Doscher</b></a> as a way to explore and learn about cislunar orbits, and to share what he found with anyone curious about the space between Earth and the Moon. He built it with <a href="https://www.anthropic.com/claude">Claude</a>, Anthropic’s AI model, and <a href="https://hermes-agent.nousresearch.com">Hermes</a>, an open-source AI agent from Nous Research. Together they dug through the research, worked out the orbit math and wrote the code, and every fact in the data links back to the source it came from.</p>
+        <p>It’s an independent, non-commercial project, not affiliated with or endorsed by NASA, JPL or any other agency. The source code is on <a href="https://github.com/jdoscher/sicklunar">GitHub</a>.</p>
+      </section>
+
+      <section id="privacy" aria-labelledby="privacy-title">
+        <h2 id="privacy-title">Privacy</h2>
+        <p><b>Sicklunar stores your progress only in this browser.</b> Your last plan and the challenges you have finished are saved in this browser’s local storage, on your own device. They are never sent anywhere, and clearing this site’s data in your browser erases them.</p>
+        <p>There are no cookies, accounts, ads, analytics or tracking scripts, and nothing loads from other companies’ servers: the pages, fonts, images and data all come from sicklunar.com. There is no chat and nothing to post, so students can’t share personal information through it.</p>
+      </section>
+
+      <section id="accuracy" aria-labelledby="accuracy-title">
+        <h2 id="accuracy-title">How accurate is it?</h2>
+        <p>Accurate enough to learn from, simplified enough to run in a browser. <b>Don’t use it to plan a real mission.</b></p>
+        <ul>
+          <li><b>Flight paths</b> use a simplified three-body model: Earth’s and the Moon’s gravity pull on the spacecraft at the same time (the “circular restricted three-body problem”). The Sun’s pull is left out, and the Moon’s orbit is treated as a perfect circle.</li>
+          <li><b>The Moon and the Sun</b> are placed for your chosen date with the formulas in Jean Meeus’s <i>Astronomical Algorithms</i>. That decides the Moon’s phase, where it is in the sky, and whether a landing site is in sunlight.</li>
+          <li><b>Engine burns</b> happen in an instant, where real engines burn for minutes. <b>Fuel</b> is counted in rounded units of 100 m/s, and the rocket’s climb to orbit isn’t taken from your tank.</li>
+          <li><b>Numbers differ a little from real missions.</b> For example, the model’s 9:2 near-rectilinear halo orbit passes 2,931 km above the Moon, where NASA quotes 3,195 to 3,557 km. Where the app simplifies something important, it says so on screen.</li>
+        </ul>
+      </section>
+
+      <section id="credits" aria-labelledby="credits-title">
+        <h2 id="credits-title">Credits and sources</h2>
+        <p>Sicklunar is built on public science. Every fact in it comes from a source we can point to; the full list of links is in the open data files in the GitHub repository.</p>
+
+        <h3>Orbits and positions</h3>
+        <ul class="ruled credit-list">
+          <li class="credit"><p class="credit-name">Three-Body Periodic Orbits</p>
+            <p class="credit-what">Starting points, periods and stability of <b>48 orbit families</b> (42 Earth–Moon, 6 Sun–Earth), such as halo, Lyapunov, distant retrograde and resonant orbits. From the <a href="https://ssd-api.jpl.nasa.gov/doc/periodic_orbits.html">Three-Body Periodic Orbits API</a> of JPL’s Solar System Dynamics group.</p>
+            <p class="credit-lic"><span>Courtesy NASA/JPL-Caltech</span></p></li>
+          <li class="credit"><p class="credit-name">Sun and Moon positions</p>
+            <p class="credit-what">Formulas from Jean Meeus, <i>Astronomical Algorithms</i> (2nd edition, Willmann-Bell, 1998), chapters 25, 47 and 53, written as our own code.</p>
+            <p class="credit-lic"><span>Algorithms: Jean Meeus</span></p></li>
+        </ul>
+
+        <h3>Images</h3>
+        <ul class="ruled credit-list">
+          <li class="credit"><p class="credit-name">Earth</p>
+            <p class="credit-what">NASA SVS #3615, “Equirectangular Projected Earth for LARGEST”, <a href="https://svs.gsfc.nasa.gov/3615">NASA/Goddard Space Flight Center Scientific Visualization Studio</a>. Blue Marble Next Generation data courtesy of Reto Stöckli (NASA/GSFC) and NASA’s Earth Observatory. Resized to 2048 × 1024 and saved as WebP.</p>
+            <p class="credit-lic"><span>NASA SVS #3615</span>Public domain</p></li>
+          <li class="credit"><p class="credit-name">Moon</p>
+            <p class="credit-what">NASA SVS #4720, “CGI Moon Kit”, <a href="https://svs.gsfc.nasa.gov/4720">NASA’s Scientific Visualization Studio</a>: Ernie Wright (visualizer), Noah Petro (scientist). Colour from the Lunar Reconnaissance Orbiter Camera (LROC) wide-angle colour mosaic (NASA/GSFC/Arizona State University). The app uses the kit’s 1024 × 512 map saved as WebP; the crescent on the home page is rendered from the kit’s larger map.</p>
+            <p class="credit-lic"><span>NASA SVS #4720</span>Public domain</p></li>
+        </ul>
+
+        <h3>Research data</h3>
+        <p>Compiled for Sicklunar. Every record carries its source links and a label: <b>Fact</b> (an agency, peer-reviewed or primary document), <b>Reported</b> (a secondary source such as Wikipedia or the news) or <b>Inference</b> (our own reasoning, flagged in the app).</p>
+        <div class="table-wrap">
+          <table>
+            <caption class="sr-only">Research data files, their size and main sources</caption>
+            <thead><tr><th scope="col">Data</th><th scope="col">Records</th><th scope="col">Main sources</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Launch sites</th><td class="n">10 sites</td><td>Launch-vehicle user’s guides (SpaceX Falcon, Rocket Lab Electron, Arianespace Ariane 6, Mitsubishi Heavy Industries H-IIA, Starsem Soyuz); NASA, CNSA, JAXA, ISRO; Wikipedia.</td></tr>
+              <tr><th scope="row">Moon sites</th><td class="n">47 sites</td><td>LRO Camera team (Arizona State University), including Wagner et al. 2017; NASA; NASA Space Science Data Coordinated Archive (NSSDC); IAU/USGS Gazetteer of Planetary Nomenclature; USGS ScienceBase (Artemis regions).</td></tr>
+              <tr><th scope="row">Missions</th><td class="n">131 missions</td><td>NASA NSSDC; NASA; Gunter’s Space Page; space agency sites; Wikipedia.</td></tr>
+              <tr><th scope="row">Transfers</th><td class="n">50 legs</td><td>Lunar and Planetary Institute; NASA Technical Reports Server; JPL DESCANSO; Purdue University; AMOS conference papers; ESA.</td></tr>
+              <tr><th scope="row">Coverage sensors</th><td class="n">17 sensors, 11 findings</td><td>AMOS conference papers; arXiv; Space Symposium; Purdue University; JPL; ESA.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Software and fonts</h3>
+        <ul class="ruled credit-list">
+          <li class="credit"><p class="credit-name">three.js</p><p class="credit-what">3D drawing in the Mission planner and the Orbit lab.</p><p class="credit-lic"><span>MIT licence</span>© three.js authors</p></li>
+          <li class="credit"><p class="credit-name">Saira · Atkinson Hyperlegible Next</p><p class="credit-what">Typefaces by Omnibus-Type and the Braille Institute, served from this site.</p><p class="credit-lic"><span>SIL Open Font License 1.1</span></p></li>
+          <li class="credit"><p class="credit-name">Vite, TypeScript, NumPy, SciPy, Matplotlib</p><p class="credit-what">Tools that build the site and compute the orbit data before it is published. They don’t run in your browser.</p><p class="credit-lic"><span>MIT · Apache-2.0 · BSD-3 · BSD-3 · Matplotlib licence</span></p></li>
+        </ul>
+        <p class="note">NASA images are used under <a href="https://www.nasa.gov/nasa-brand-center/images-and-media/">NASA’s media guidelines</a>; their use doesn’t mean NASA endorses this site.</p>
+      </section>
+
+      <section id="licence" aria-labelledby="licence-title">
+        <h2 id="licence-title">Licence</h2>
+        <ul class="ruled">
+          <li><b>Code:</b> MIT licence.</li>
+          <li><b>Lesson text and our data compilations:</b> Creative Commons Attribution 4.0 (CC BY 4.0). Please credit “Sicklunar (sicklunar.com)”.</li>
+          <li><b>Images:</b> as set by their sources (the NASA images above are public domain).</li>
+        </ul>
+      </section>
+
+      <section id="contact" aria-labelledby="contact-title">
+        <h2 id="contact-title">Contact</h2>
+        <p>Found a mistake or have an idea? Please open an issue on <a href="https://github.com/jdoscher/sicklunar/issues">GitHub</a> (you’ll need a free GitHub account) and say which page and what looks wrong. Corrections with a source link help the most.</p>
+      </section>
+    </article>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="foot-inner">
+    <div class="foot-brand"><img src="/brand/mark-1-sickle-onhull.svg?v=1" alt="" width="32" height="32" /><span>Sicklunar · Real paths between Earth and the Moon.</span></div>
+    <nav aria-label="Footer"><ul>
+      <li><a href="/mission">Mission planner</a></li><li><a href="/lab">Orbit lab</a></li><li><a href="/teachers">For teachers</a></li><li><a href="/about">About</a></li><li><a href="/about#credits">Credits</a></li><li><a href="https://github.com/jdoscher/sicklunar">GitHub</a></li>
+    </ul></nav>
+    <p class="foot-note">An independent learning project by <a href="https://doscher.com">Jay Doscher</a>. Not affiliated with NASA.</p>
+  </div>
+</footer>
+<script type="module" src="/src/site/reading.ts"></script>
+</body>
+</html>

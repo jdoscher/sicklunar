@@ -1,0 +1,263 @@
+{
+ "photometry": {
+  "formula": "mag = mag_sun - 2.5*log10(I_sc/I_sun); I_sc/I_sun = (1/d^2) * (2/3) * (C_d/pi^2) * r^2 * (sin(a) + (pi - a)*cos(a)); d = observer-object distance (same units as r), r = sphere radius, a = solar phase angle (rad, Sun-object-observer), C_d = Lambertian diffuse reflection coefficient. Equivalent area form (Wilmer 2022): Mv = mag_sun - 2.5*log10(A*Psi/d^2), Psi = (2/3)*(C_d/pi)*(sin(a)+(pi-a)*cos(a)), A = cross-section area.",
+  "mag_sun": -26.74,
+  "mag_sun_source_url": "https://arxiv.org/html/2408.06238v3",
+  "albedo_default": 0.2,
+  "albedo_default_note": "Chow et al. 2021 (diffuse sphere, 1 m^2 cross-section, reflectance 0.2) and Gorman et al. 2023 (1.5 m diameter, albedo 0.2). Alternatives in literature: 0.17 (Bolden 2020), 0.5 (Bhadauria 2024), 0.86 (Wilmer 2022).",
+  "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2021_AAS_FruHowDeMBha.pdf",
+  "albedo_source_url": "https://amostech.com/TechnicalPapers/2021/Poster/Chow.pdf",
+  "daytime_min_brightness_mag": 8,
+  "arcsec_to_km_at_lunar_distance": 1.86,
+  "arcsec_source_url": "https://amostech.com/TechnicalPapers/2021/Poster/Chow.pdf"
+ },
+ "exclusion": {
+  "sun_deg": 30,
+  "moon_deg": 10,
+  "earth_limb_deg": 15,
+  "basing": "space-based observer; angles measured at observer between target and body",
+  "source_url": "https://amostech.com/TechnicalPapers/2024/Cislunar_SDA/Bhadauria.pdf",
+  "alternatives": [
+   {
+    "basing": "space",
+    "sun_deg": 30,
+    "earth_deg": 15,
+    "moon_deg": 6,
+    "limiting_mag": 18.5,
+    "source_url": "https://amostech.com/TechnicalPapers/2022/Poster/Wilmer.pdf"
+   },
+   {
+    "basing": "space",
+    "sun_keepout_deg_options": [
+     30,
+     50
+    ],
+    "source_url": "https://amostech.com/TechnicalPapers/2023/Poster/Gorman.pdf"
+   },
+   {
+    "basing": "ground",
+    "sun_from_limb_deg": 20,
+    "earth_from_limb_deg": 5,
+    "moon_from_limb_deg": 5,
+    "source_url": "https://amostech.com/TechnicalPapers/2020/Cislunar-SSA/Dao.pdf"
+   },
+   {
+    "basing": "ground",
+    "min_elevation_deg": 10,
+    "sun_elevation_max_deg": -10,
+    "moon_from_limb_deg": 1,
+    "source_url": "https://amostech.com/TechnicalPapers/2021/Poster/Chow.pdf"
+   },
+   {
+    "basing": "cone_of_shame_target_volume",
+    "cone_half_or_full_angle_deg": 30,
+    "from": "2x GEO altitude",
+    "to": "Earth-Moon L2",
+    "n_targets": 304,
+    "note": "paper says 'cone angle of 30 deg' without specifying half/full",
+    "source_url": "https://arxiv.org/html/2408.06238v3"
+   }
+  ]
+ },
+ "sensors": [
+  {
+   "name": "GEODSS (Deep Stare)",
+   "basing": "ground",
+   "aperture_m": 1.0,
+   "limiting_mag": 18,
+   "fov_deg": null,
+   "source_url": "https://www.spacesymposium.org/wp-content/uploads/2017/10/M.Ackermann_31st_Space_Symposium_Tech_Track_paper.pdf",
+   "label": "Reported: typical sensitivity ~18th mag; FOV ~2 square degrees (area, not a linear angle); 17.7 sidereal / 18.9 rate-track per mostlymissiledefense.com"
+  },
+  {
+   "name": "Space Surveillance Telescope (SST)",
+   "basing": "ground",
+   "aperture_m": 3.5,
+   "limiting_mag": null,
+   "fov_deg": null,
+   "source_url": "https://www.spacesymposium.org/wp-content/uploads/2017/10/M.Ackermann_31st_Space_Symposium_Tech_Track_paper.pdf",
+   "label": "Reported: f/1, ~6 square degrees field; limiting magnitude not found"
+  },
+  {
+   "name": "Goldstone DSS-14 radar (bistatic with GBT)",
+   "basing": "ground",
+   "aperture_m": 70,
+   "limiting_mag": null,
+   "fov_deg": 0.03,
+   "source_url": "https://echo.jpl.nasa.gov/asteroids/brozovic.etal.2017.lunar.spacecraft.paper.pdf",
+   "label": "Fact: 450 kW X-band; detected 2-2.6 m spacecraft in lunar orbit; transmit 3 dB beam 108 arcsec (=0.03 deg)"
+  },
+  {
+   "name": "Notional global ground network (Frueh et al.)",
+   "basing": "ground",
+   "aperture_m": null,
+   "limiting_mag": 20,
+   "fov_deg": null,
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2021_AAS_FruHowDeMBha.pdf",
+   "label": "Fact: study also used limiting mag 16; even mag 20 leaves large orbit fractions unobservable"
+  },
+  {
+   "name": "Notional ground sites Maui/Azores/Cocos (Chow et al.)",
+   "basing": "ground",
+   "aperture_m": null,
+   "limiting_mag": 24,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2021/Poster/Chow.pdf",
+   "label": "Fact: degraded case limiting mag 20; 1 arcsec astrometry; 600 s cadence"
+  },
+  {
+   "name": "Sapphire",
+   "basing": "LEO",
+   "aperture_m": 0.15,
+   "limiting_mag": 15,
+   "fov_deg": 1.4,
+   "source_url": "https://www.spacesymposium.org/wp-content/uploads/2017/10/M.Ackermann_31st_Space_Symposium_Tech_Track_paper.pdf",
+   "label": "Reported: 1.4 x 1.4 deg FOV, 786 km SSO"
+  },
+  {
+   "name": "SBV (MIT LL)",
+   "basing": "LEO",
+   "aperture_m": 0.15,
+   "limiting_mag": 15,
+   "fov_deg": null,
+   "source_url": "https://www.spacesymposium.org/wp-content/uploads/2017/10/M.Ackermann_31st_Space_Symposium_Tech_Track_paper.pdf",
+   "label": "Reported; SBSS estimated ~16.5 by aperture scaling (authors' inference)"
+  },
+  {
+   "name": "ORS-5 / SensorSAT",
+   "basing": "LEO",
+   "aperture_m": 0.1,
+   "limiting_mag": null,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2024/SDA/Kirshner.pdf",
+   "label": "Fact: equatorial LEO, TDI, 7.5 s effective integration, GEO-belt survey"
+  },
+  {
+   "name": "Bolden 2020 notional 42 cm payload",
+   "basing": "GEO",
+   "aperture_m": 0.42,
+   "limiting_mag": null,
+   "fov_deg": 1.8,
+   "source_url": "https://amostech.com/TechnicalPapers/2020/Cislunar-SSA/Bolden.pdf",
+   "label": "Fact: same payload modeled on LEO, GEO, Lagrange, P/3 resonant and chaotic orbits; SNR-based detection of 1 m^2 albedo-0.17 sphere"
+  },
+  {
+   "name": "QuantumNet example (Moon-centered volume)",
+   "basing": "EM-L1",
+   "aperture_m": 0.3,
+   "limiting_mag": null,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2023/Poster/Gorman.pdf",
+   "label": "Fact: one each in 30,000 km EML-1 halo, EML-2 halo, DRO; f/1.5, 10 s integration -> 96.9% mean observation"
+  },
+  {
+   "name": "QuantumNet example (Earth-Moon corridor)",
+   "basing": "DRO",
+   "aperture_m": 0.7,
+   "limiting_mag": null,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2023/Poster/Gorman.pdf",
+   "label": "Fact: 5 DRO + 1 EML-1 + 1 EML-2, f/6, 1 s integration -> 95.0%"
+  },
+  {
+   "name": "Wilmer/Bettinger halo constellation",
+   "basing": "EM-L1",
+   "aperture_m": null,
+   "limiting_mag": 18.5,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2022/Poster/Wilmer.pdf",
+   "label": "Fact: 12 sats in L1 halo -> 99.28% NRHO target visibility over 30 days"
+  },
+  {
+   "name": "Wilmer/Bettinger halo constellation (L2)",
+   "basing": "EM-L2",
+   "aperture_m": null,
+   "limiting_mag": 18.5,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2022/Poster/Wilmer.pdf",
+   "label": "Fact: 12 sats in 'Halo 2' (L2) -> 98.96%"
+  },
+  {
+   "name": "Bhadauria/Black/Frueh optimized observers",
+   "basing": "EM-L2",
+   "aperture_m": null,
+   "limiting_mag": 18,
+   "fov_deg": null,
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Cislunar_SDA/Bhadauria.pdf",
+   "label": "Fact: 2-10 PSO-placed observers around L2-region key volumes; basing approximate (positions optimized, not a named orbit)"
+  },
+  {
+   "name": "Shimane FLP cone-of-shame (m_crit 20)",
+   "basing": "resonant",
+   "aperture_m": null,
+   "limiting_mag": 20,
+   "fov_deg": null,
+   "source_url": "https://arxiv.org/html/2408.06238v3",
+   "label": "Fact: L1 Lyapunov (1:1) x1 + L2N halo (3:1) x4"
+  },
+  {
+   "name": "CubeSat-class telescope",
+   "basing": "resonant",
+   "aperture_m": null,
+   "limiting_mag": 15,
+   "fov_deg": null,
+   "source_url": "https://arxiv.org/pdf/2302.09732",
+   "label": "Fact: authors cite state-of-the-art CubeSat telescopes at mag 12-15; used as lower bound of sweep"
+  },
+  {
+   "name": "AFRL Oracle-P",
+   "basing": "EM-L1",
+   "aperture_m": null,
+   "limiting_mag": null,
+   "fov_deg": null,
+   "source_url": "https://beyondleo.org/mission/oracle-mission-keeping-watch-between-earth-and-the-moon/",
+   "label": "Reported: wide-field search + narrow-field track sensors; specs not public; delivery 2027 per Advanced Space"
+  }
+ ],
+ "placement_findings": [
+  {
+   "finding": "Single P/3 lunar-resonant or chaotic-orbit observer reached 27% of a 475,000 km 4pi domain; all other single-orbit types <10%. Adding satellites in one orbit type increases revisits but not coverage; mixing orbit types is required.",
+   "source_url": "https://amostech.com/TechnicalPapers/2020/Cislunar-SSA/Bolden.pdf"
+  },
+  {
+   "finding": "GEO + Lagrange + chaotic constellation with 42 cm optics gave persistent custody of a waxing-crescent free-return trajectory except for the hardest 1.5 days; a 75-satellite LEO constellation is blind in the sunward hemisphere.",
+   "source_url": "https://amostech.com/TechnicalPapers/2020/Cislunar-SSA/Bolden.pdf"
+  },
+  {
+   "finding": "Moon-centered volume: 99.9% coverage with 5 satellites at 0.3 m; 100% with 9 satellites at 0.5 m; >90% with 3 sats at 0.3 m or 13 sats at 0.1 m. Earth-Moon corridor needs 0.6-0.8 m apertures and >=7 satellites for >90% (or 15+ at 0.3-0.5 m).",
+   "source_url": "https://amostech.com/TechnicalPapers/2023/Poster/Gorman.pdf"
+  },
+  {
+   "finding": "12 observers in an L1 halo saw an NRHO target 99.28% of 30 days (L2 halo 98.96%); touring periodic orbits slightly worse for NRHO surveillance.",
+   "source_url": "https://amostech.com/TechnicalPapers/2022/Poster/Wilmer.pdf"
+  },
+  {
+   "finding": "With 10 optimally placed observers, custody of objects maneuvering off L2 Lyapunov/halo or NRHO orbits is nearly guaranteed at limiting magnitude 18 with Sun 30/Moon 10/Earth 15 deg exclusions; one observer cannot guarantee custody.",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Cislunar_SDA/Bhadauria.pdf"
+  },
+  {
+   "finding": "Single libration-orbit observer coverage of the cone of shame degrades below cutoff mag 18 and is 0% at mag <=16; at mag 16, 2 observers reach ~44% and 4 reach 63%; at mag 17, 2 observers reach ~95%. Orbit-family diversity and small phase offsets help.",
+   "source_url": "https://arxiv.org/pdf/2302.09732"
+  },
+  {
+   "finding": "For demand across L1 and L2, a large 1:1 resonant L1 Lyapunov is advantageous; observers on 1:1 resonant orbits cluster leading/trailing because solar phase dominates; for L2-centered demand, 2:1 and 3:1 resonant L2 halos are favored.",
+   "source_url": "https://arxiv.org/html/2408.06238v3"
+  },
+  {
+   "finding": "Earth-Moon 2:1 resonant orbits precess to cover the whole cislunar disc in ~20 revolutions (~26-day period), have benign uncertainty growth, and are trackable by a global magnitude-20 ground network; a lunar-surface sensor adds little for these orbits.",
+   "source_url": "https://conference.sdo.esoc.esa.int/proceedings/sdc8/paper/261/SDC8-paper261.pdf"
+  },
+  {
+   "finding": "L2 halo targets are hard to observe from all observer families; L4 planar orbits perform well both as observers and as targets; Moon orbits are dramatically better than Earth orbits for observing L1/L2 objects.",
+   "source_url": "https://cdcl.umd.edu/papers/aas21.pdf"
+  },
+  {
+   "finding": "Global ground optical network simulation of Artemis I left ~9 continuous days unobservable; most sensors saw <20% of the trajectory.",
+   "source_url": "https://arxiv.org/html/2408.03261v1"
+  },
+  {
+   "finding": "No ground-based sensor can fully avoid solar exclusion; spaceborne tandem observers offset from the Earth-Sun line can largely avoid it; collinear Lagrange points have the most significant exclusion periods.",
+   "source_url": "https://amostech.com/TechnicalPapers/2020/Cislunar-SSA/Cunio.pdf"
+  }
+ ]
+}

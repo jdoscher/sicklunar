@@ -1,0 +1,15 @@
+[project]
+name = "cislunar"
+version = "0.1.0"
+description = "Cislunar orbit engine: CR3BP dynamics, NASA/JPL periodic-orbit catalog, drawings and app exports"
+requires-python = ">=3.11"
+dependencies = ["numpy>=2", "scipy>=1.13", "matplotlib>=3.9"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+include = ["cislunar*"]
+
+[tool.setuptools.package-data]
+cislunar = ["jpl_cache/*.json.gz", "research_data/*.json", "mission_data/*.json"]

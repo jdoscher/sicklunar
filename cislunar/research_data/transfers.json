@@ -1,0 +1,650 @@
+{
+ "nodes": [
+  {
+   "id": "earth",
+   "name": "Earth surface",
+   "type": "surface"
+  },
+  {
+   "id": "leo",
+   "name": "Low Earth orbit (200-400 km)",
+   "type": "earth_orbit"
+  },
+  {
+   "id": "gto",
+   "name": "Geostationary transfer orbit",
+   "type": "earth_orbit"
+  },
+  {
+   "id": "geo",
+   "name": "Geostationary orbit",
+   "type": "earth_orbit"
+  },
+  {
+   "id": "tli",
+   "name": "Trans-lunar injection state (C3 ~ -2 km2/s2)",
+   "type": "transfer_state"
+  },
+  {
+   "id": "llo",
+   "name": "Low lunar orbit, 100 km",
+   "type": "lunar_orbit"
+  },
+  {
+   "id": "nrho",
+   "name": "L2 southern NRHO, 9:2 (Gateway)",
+   "type": "three_body_orbit"
+  },
+  {
+   "id": "dro",
+   "name": "Lunar distant retrograde orbit (Artemis I scale)",
+   "type": "three_body_orbit"
+  },
+  {
+   "id": "eml1",
+   "name": "Earth-Moon L1 (halo/libration orbit)",
+   "type": "lagrange"
+  },
+  {
+   "id": "eml2",
+   "name": "Earth-Moon L2 (halo/libration orbit)",
+   "type": "lagrange"
+  },
+  {
+   "id": "eml3",
+   "name": "Earth-Moon L3",
+   "type": "lagrange"
+  },
+  {
+   "id": "eml4",
+   "name": "Earth-Moon L4",
+   "type": "lagrange"
+  },
+  {
+   "id": "eml5",
+   "name": "Earth-Moon L5",
+   "type": "lagrange"
+  },
+  {
+   "id": "moon",
+   "name": "Lunar surface",
+   "type": "surface"
+  },
+  {
+   "id": "sel1",
+   "name": "Sun-Earth L1",
+   "type": "lagrange"
+  },
+  {
+   "id": "sel2",
+   "name": "Sun-Earth L2 (quasi-halo)",
+   "type": "lagrange"
+  },
+  {
+   "id": "escape",
+   "name": "Deep-space escape",
+   "type": "transfer_state"
+  },
+  {
+   "id": "cycler31",
+   "name": "Aboard a 3:1 resonant Earth-Moon cycler",
+   "type": "transfer_state"
+  }
+ ],
+ "legs": [
+  {
+   "from": "earth",
+   "to": "leo",
+   "dv_kms_min": 10.0,
+   "dv_kms_max": 10.0,
+   "tof_days_min": 0.005,
+   "tof_days_max": 0.005,
+   "method": "launch (incl. gravity/drag losses)",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "leo",
+   "to": "gto",
+   "dv_kms_min": 2.4,
+   "dv_kms_max": 2.46,
+   "tof_days_min": 0.22,
+   "tof_days_max": 0.22,
+   "method": "Hohmann burn 1 from 200-400 km (vis-viva calc)",
+   "source_url": "https://www.esa.int/ESA_Multimedia/Images/2020/03/Geostationary_transfer_orbit",
+   "label": "Inference"
+  },
+  {
+   "from": "gto",
+   "to": "geo",
+   "dv_kms_min": 1.46,
+   "dv_kms_max": 1.84,
+   "tof_days_min": 0.0,
+   "tof_days_max": 0.0,
+   "method": "apogee circularization; upper value includes 28.5 deg plane change (vis-viva calc)",
+   "source_url": "https://www.esa.int/ESA_Multimedia/Images/2020/03/Geostationary_transfer_orbit",
+   "label": "Inference"
+  },
+  {
+   "from": "leo",
+   "to": "tli",
+   "dv_kms_min": 3.08,
+   "dv_kms_max": 3.28,
+   "tof_days_min": 0.15,
+   "tof_days_max": 0.15,
+   "method": "TLI burn (NASA 3.2; DRM 3.276 incl 5% FPR)",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "llo",
+   "dv_kms_min": 0.813,
+   "dv_kms_max": 1.35,
+   "tof_days_min": 2,
+   "tof_days_max": 6,
+   "method": "direct transfer + LOI (equatorial 0.9, global 1.35)",
+   "source_url": "https://descanso.jpl.nasa.gov/monograph/series12/LunarTraj--05Chapter4TransferstoLowLunarOrbits.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "llo",
+   "dv_kms_min": 0.64,
+   "dv_kms_max": 0.64,
+   "tof_days_min": 70,
+   "tof_days_max": 120,
+   "method": "low-energy ballistic lunar transfer (BLT) + LOI (min)",
+   "source_url": "https://descanso.jpl.nasa.gov/monograph/series12/LunarTraj--05Chapter4TransferstoLowLunarOrbits.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "leo",
+   "to": "llo",
+   "dv_kms_min": 3.97,
+   "dv_kms_max": 4.5,
+   "tof_days_min": 2,
+   "tof_days_max": 4,
+   "method": "direct, all-in (long vs short ToF)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "llo",
+   "to": "leo",
+   "dv_kms_min": 1.31,
+   "dv_kms_max": 1.31,
+   "tof_days_min": 4,
+   "tof_days_max": 4,
+   "method": "TEI + aerocapture into LEO",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "llo",
+   "to": "earth",
+   "dv_kms_min": 0.9,
+   "dv_kms_max": 1.35,
+   "tof_days_min": 4,
+   "tof_days_max": 4,
+   "method": "TEI to direct entry (equatorial vs global LLO)",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "nrho",
+   "dv_kms_min": 0.45,
+   "dv_kms_max": 0.45,
+   "tof_days_min": 5,
+   "tof_days_max": 5,
+   "method": "direct fast transfer + NRHO insertion (crewed)",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "nrho",
+   "dv_kms_min": 0.07,
+   "dv_kms_max": 0.15,
+   "tof_days_min": 80,
+   "tof_days_max": 180,
+   "method": "ballistic lunar transfer (cargo; NASA 0.115/120 d; CAPSTONE 99% budget 0.110)",
+   "source_url": "https://advancedspace.com/wp-content/uploads/2025/08/blt-quick-ref.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "nrho",
+   "to": "earth",
+   "dv_kms_min": 0.45,
+   "dv_kms_max": 0.45,
+   "tof_days_min": 5,
+   "tof_days_max": 5,
+   "method": "NRHO departure to direct entry",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "nrho",
+   "to": "llo",
+   "dv_kms_min": 0.684,
+   "dv_kms_max": 0.831,
+   "tof_days_min": 0.5,
+   "tof_days_max": 1.0,
+   "method": "impulsive, polar 0.5 d to equatorial 1 d (NASA budget 0.74-0.75)",
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2018_AAS_WhiDavBurMcCPowMcGHow.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "llo",
+   "to": "nrho",
+   "dv_kms_min": 0.705,
+   "dv_kms_max": 0.831,
+   "tof_days_min": 0.5,
+   "tof_days_max": 4.0,
+   "method": "impulsive; upper values are anytime-abort cases",
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2018_AAS_WhiDavBurMcCPowMcGHow.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "llo",
+   "to": "moon",
+   "dv_kms_min": 1.87,
+   "dv_kms_max": 2.18,
+   "tof_days_min": 0.04,
+   "tof_days_max": 0.04,
+   "method": "powered descent",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "moon",
+   "to": "llo",
+   "dv_kms_min": 1.86,
+   "dv_kms_max": 1.97,
+   "tof_days_min": 0.04,
+   "tof_days_max": 0.04,
+   "method": "ascent",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "moon",
+   "dv_kms_min": 2.9,
+   "dv_kms_max": 2.9,
+   "tof_days_min": 3.75,
+   "tof_days_max": 3.75,
+   "method": "direct descent from trans-lunar (Apollo CLOC style)",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "moon",
+   "to": "earth",
+   "dv_kms_min": 2.7,
+   "dv_kms_max": 2.7,
+   "tof_days_min": 4,
+   "tof_days_max": 4,
+   "method": "direct ascent to Earth entry",
+   "source_url": "https://www.nasa.gov/wp-content/uploads/2023/10/nrho-artemis-orbit.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "dro",
+   "dv_kms_min": 0.33,
+   "dv_kms_max": 0.33,
+   "tof_days_min": 10,
+   "tof_days_max": 10,
+   "method": "outbound powered lunar flyby + DRO insertion (Artemis I as flown, sum of burns)",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20230010480/downloads/AAS_23-363_artemis1-operations_rev2.pdf",
+   "label": "Inference"
+  },
+  {
+   "from": "dro",
+   "to": "earth",
+   "dv_kms_min": 0.43,
+   "dv_kms_max": 0.43,
+   "tof_days_min": null,
+   "tof_days_max": null,
+   "method": "DRO departure + return powered flyby (Artemis I as flown, sum of burns)",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20230010480/downloads/AAS_23-363_artemis1-operations_rev2.pdf",
+   "label": "Inference"
+  },
+  {
+   "from": "nrho",
+   "to": "dro",
+   "dv_kms_min": 0.714,
+   "dv_kms_max": 1.474,
+   "tof_days_min": 73,
+   "tof_days_max": 168,
+   "method": "impulsive, CR3BP (via P3DRO manifold vs puncture plot)",
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2018_AIAA_PriZimHow.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "nrho",
+   "to": "dro",
+   "dv_kms_min": 0.257,
+   "dv_kms_max": 0.479,
+   "tof_days_min": 58,
+   "tof_days_max": 121,
+   "method": "low-thrust (200 mN, 1000 kg, Isp 2000 s), dv-equivalent via resonant/butterfly chain",
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2018_AIAA_PriZimHow.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "nrho",
+   "to": "eml2",
+   "dv_kms_min": 0.352,
+   "dv_kms_max": 0.352,
+   "tof_days_min": 91.5,
+   "tof_days_max": 91.5,
+   "method": "impulsive NRHO to L2 halo, CR3BP",
+   "source_url": "https://engineering.purdue.edu/people/kathleen.howell.1/Publications/Conferences/2018_AIAA_PriZimHow.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "leo",
+   "to": "eml1",
+   "dv_kms_min": 3.77,
+   "dv_kms_max": 4.41,
+   "tof_days_min": 2,
+   "tof_days_max": 4,
+   "method": "direct (short vs long ToF)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml1",
+   "to": "leo",
+   "dv_kms_min": 0.77,
+   "dv_kms_max": 0.77,
+   "tof_days_min": 4,
+   "tof_days_max": 4,
+   "method": "departure + aerocapture",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "leo",
+   "to": "eml2",
+   "dv_kms_min": 3.43,
+   "dv_kms_max": 3.95,
+   "tof_days_min": 4,
+   "tof_days_max": 8,
+   "method": "direct with lunar gravity assist (short vs long ToF)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml2",
+   "to": "leo",
+   "dv_kms_min": 0.35,
+   "dv_kms_max": 0.35,
+   "tof_days_min": 8,
+   "tof_days_max": 8,
+   "method": "departure + aerocapture",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "eml1",
+   "dv_kms_min": 0.43,
+   "dv_kms_max": 0.95,
+   "tof_days_min": 5,
+   "tof_days_max": 60,
+   "method": "direct transfer + halo insertion (typ. 0.5-0.6)",
+   "source_url": "https://descanso.jpl.nasa.gov/monograph/series12/LunarTraj--04Chapter3TransferstoLunarLibrationOrbits.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "eml2",
+   "dv_kms_min": 0.43,
+   "dv_kms_max": 0.95,
+   "tof_days_min": 5,
+   "tof_days_max": 60,
+   "method": "direct transfer + halo insertion (typ. 0.5-0.6)",
+   "source_url": "https://descanso.jpl.nasa.gov/monograph/series12/LunarTraj--04Chapter3TransferstoLunarLibrationOrbits.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "tli",
+   "to": "eml2",
+   "dv_kms_min": 0.0,
+   "dv_kms_max": 0.0,
+   "tof_days_min": 83,
+   "tof_days_max": 140,
+   "method": "low-energy BLT, ballistic insertion (excludes statistical TCMs)",
+   "source_url": "https://descanso.jpl.nasa.gov/monograph/series12/LunarTraj--04Chapter3TransferstoLunarLibrationOrbits.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml1",
+   "to": "llo",
+   "dv_kms_min": 0.64,
+   "dv_kms_max": 0.75,
+   "tof_days_min": 2,
+   "tof_days_max": 3,
+   "method": "impulsive (bidirectional on chart)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "llo",
+   "to": "eml2",
+   "dv_kms_min": 0.65,
+   "dv_kms_max": 0.65,
+   "tof_days_min": 3,
+   "tof_days_max": 3,
+   "method": "impulsive (bidirectional on chart)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml1",
+   "to": "moon",
+   "dv_kms_min": 2.52,
+   "dv_kms_max": 2.52,
+   "tof_days_min": 3,
+   "tof_days_max": 3,
+   "method": "direct descent (bidirectional on chart)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "moon",
+   "to": "eml2",
+   "dv_kms_min": 2.53,
+   "dv_kms_max": 2.53,
+   "tof_days_min": 3,
+   "tof_days_max": 3,
+   "method": "propulsive ascent (bidirectional on chart)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "moon",
+   "to": "eml2",
+   "dv_kms_min": 2.4,
+   "dv_kms_max": 2.4,
+   "tof_days_min": null,
+   "tof_days_max": null,
+   "method": "mass driver (electric launch to lunar escape speed; ~0 propellant; passive catcher at L2)",
+   "source_url": "https://ntrs.nasa.gov/api/citations/19910073677/downloads/19910073677.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml1",
+   "to": "eml2",
+   "dv_kms_min": 0.14,
+   "dv_kms_max": 0.14,
+   "tof_days_min": 14,
+   "tof_days_max": 14,
+   "method": "heteroclinic-type transfer (bidirectional on chart)",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml2",
+   "to": "escape",
+   "dv_kms_min": 0.71,
+   "dv_kms_max": 0.71,
+   "tof_days_min": null,
+   "tof_days_max": null,
+   "method": "departure to deep space",
+   "source_url": "https://www.lpi.usra.edu/meetings/leag2012/presentations/Connolly.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml4",
+   "to": "geo",
+   "dv_kms_min": 1.36,
+   "dv_kms_max": 1.7,
+   "tof_days_min": 15.7,
+   "tof_days_max": 26.8,
+   "method": "two-impulse, CR3BP (min-dv vs min-TOF)",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Poster/Evans.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml5",
+   "to": "geo",
+   "dv_kms_min": 1.37,
+   "dv_kms_max": 1.91,
+   "tof_days_min": 3.6,
+   "tof_days_max": 25.0,
+   "method": "two-impulse, CR3BP (min-dv vs min-TOF)",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Poster/Evans.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml3",
+   "to": "geo",
+   "dv_kms_min": 1.46,
+   "dv_kms_max": 1.9,
+   "tof_days_min": 3.5,
+   "tof_days_max": 19.8,
+   "method": "two-impulse, CR3BP (min-dv vs min-TOF)",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Poster/Evans.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml4",
+   "to": "leo",
+   "dv_kms_min": 3.64,
+   "dv_kms_max": 3.75,
+   "tof_days_min": 4.6,
+   "tof_days_max": 19.9,
+   "method": "two-impulse, fully propulsive (no aerobraking), CR3BP",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Poster/Evans.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml5",
+   "to": "leo",
+   "dv_kms_min": 3.6,
+   "dv_kms_max": 3.75,
+   "tof_days_min": 26.3,
+   "tof_days_max": 26.9,
+   "method": "two-impulse, fully propulsive (no aerobraking), CR3BP",
+   "source_url": "https://amostech.com/TechnicalPapers/2024/Poster/Evans.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "eml2",
+   "to": "sel2",
+   "dv_kms_min": 0.029,
+   "dv_kms_max": 0.065,
+   "tof_days_min": 94,
+   "tof_days_max": 134,
+   "method": "low-energy, quasi-halo vs halo departure",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "sel2",
+   "to": "eml2",
+   "dv_kms_min": 0.0385,
+   "dv_kms_max": 0.103,
+   "tof_days_min": 127,
+   "tof_days_max": 132,
+   "method": "low-energy, to halo vs quasi-halo",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "nrho",
+   "to": "sel2",
+   "dv_kms_min": 0.085,
+   "dv_kms_max": 0.085,
+   "tof_days_min": 101,
+   "tof_days_max": 101,
+   "method": "low-energy",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "sel2",
+   "to": "nrho",
+   "dv_kms_min": 0.1285,
+   "dv_kms_max": 0.1285,
+   "tof_days_min": 142,
+   "tof_days_max": 142,
+   "method": "low-energy",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "dro",
+   "to": "sel2",
+   "dv_kms_min": 0.2565,
+   "dv_kms_max": 0.2565,
+   "tof_days_min": 149,
+   "tof_days_max": 149,
+   "method": "low-energy",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "sel2",
+   "to": "dro",
+   "dv_kms_min": 0.3258,
+   "dv_kms_max": 0.3258,
+   "tof_days_min": 81,
+   "tof_days_max": 81,
+   "method": "low-energy, arrival burn only",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20190028906/downloads/20190028906.pdf",
+   "label": "Fact"
+  },
+  {
+   "from": "leo",
+   "to": "sel2",
+   "dv_kms_min": 3.15,
+   "dv_kms_max": 3.2,
+   "tof_days_min": 30,
+   "tof_days_max": 30,
+   "method": "direct transfer (JWST ~30 d); dv is vis-viva estimate at C3 -0.7..-0.35",
+   "source_url": "https://ntrs.nasa.gov/api/citations/20220010259/downloads/Final%20AAS_22-611%20Flight%20Dynamics%20Planning%20and%20Operations%20Support%20for%20the%20JWST%20Mission.pdf",
+   "label": "Inference"
+  },
+  {
+   "from": "cycler31",
+   "to": "nrho",
+   "dv_kms_min": 1.95,
+   "dv_kms_max": 2.81,
+   "tof_days_min": 39,
+   "tof_days_max": 130,
+   "method": "via 3:1 resonant Earth-Moon cycler + manifolds/Lambert arcs, CR3BP",
+   "source_url": "https://s3.amazonaws.com/amz.xcdsystem.com/A464D031-C624-C138-7D0E208E29BC4EDD_abstract_File22414/FinalPaperPDF_6_0830054245.pdf",
+   "label": "Fact",
+   "note": "Corrected 2026-11-16: the paper (AAS 22-506) states connections to LEO were not studied, so this delta-v starts on the cycler, not in LEO."
+  }
+ ],
+ "notes": [
+  "Leg data compiled by the 2026-11-16 research pass. One leg corrected after source check (see leg note)."
+ ]
+}

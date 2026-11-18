@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#04060A" />
+  <title>Mission to the Moon · Sicklunar</title>
+  <meta name="description" content="Plan a trip to the Moon, then watch your spacecraft fly a real path. Real paths between Earth and the Moon." />
+  <link rel="canonical" href="https://sicklunar.com/mission" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sicklunar" />
+  <meta property="og:title" content="Mission Planner · Sicklunar" />
+  <meta property="og:description" content="Plan a trip to the Moon, pick a real launch pad and day, and fly a real three-body path. Free, no ads, no tracking." />
+  <meta property="og:url" content="https://sicklunar.com/mission" />
+  <meta property="og:image" content="https://sicklunar.com/og-image.png?v=1" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.ico?v=1" sizes="any" />
+  <link rel="icon" href="/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png?v=1" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=1" />
+  <link rel="manifest" href="/site.webmanifest" />
+</head>
+<body class="mission">
+  <a class="skip" href="#launch">Skip to Launch</a>
+  <header id="site-nav" data-page="mission"></header>
+  <div id="app">
+    <aside id="planner" aria-label="Mission planner">
+      <div class="planner-bar">
+        <button id="open-challenges" class="btn ghost" type="button"><svg class="i" aria-hidden="true"><use href="#i-badge"/></svg><span>Challenges</span> <span id="ch-done" class="count"></span></button>
+        <span class="spacer"></span>
+        <button id="motion-toggle" class="btn ghost" type="button" aria-pressed="false" aria-label="Reduce motion"><svg class="i" aria-hidden="true"><use href="#i-motion"/></svg><span>Reduce motion</span></button>
+        <button id="open-help" class="btn ghost" type="button" aria-label="Help" aria-keyshortcuts="Shift+Slash"><svg class="i" aria-hidden="true"><use href="#i-why"/></svg><span>Help</span></button>
+      </div>
+      <nav class="stepper" id="stepper" aria-label="Plan steps">
+        <ol>
+          <li><button type="button" data-goto="1"><b>01</b><span>Where</span></button></li>
+          <li><button type="button" data-goto="2"><b>02</b><span>From</span></button></li>
+          <li><button type="button" data-goto="3"><b>03</b><span>When</span></button></li>
+          <li><button type="button" data-goto="4"><b>04</b><span>Ship</span></button></li>
+          <li><button type="button" data-goto="5"><b>05</b><span>Check</span></button></li>
+        </ol>
+      </nav>
+      <div class="planner-scroll" id="planner-scroll">
+        <div id="active-challenge" class="challenge-strip" hidden></div>
+
+        <section class="step" id="step-1" data-step="1" aria-labelledby="h-step-1">
+          <h2 class="step-h" id="h-step-1"><span class="idx">01</span><span class="head">Where do you want to go?</span></h2>
+          <div id="dests" role="radiogroup" aria-labelledby="h-step-1"></div>
+          <p id="dest-story" class="story"></p>
+          <div id="land-box" hidden>
+            <div class="sub"><h3 class="head" id="h-land">Landing site</h3><span class="hint">or tap a pin on the Moon</span></div>
+            <div class="land-tools">
+              <div class="filters" role="group" aria-label="Show landing sites">
+                <button type="button" class="filter" data-filter="all" aria-pressed="true">All</button>
+                <button type="button" class="filter" data-filter="pole" aria-pressed="false">South pole</button>
+                <button type="button" class="filter" data-filter="artemis" aria-pressed="false">Artemis</button>
+                <button type="button" class="filter" data-filter="history" aria-pressed="false">History</button>
+              </div>
+              <label class="search"><svg class="i" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Search landing sites</span><input id="land-search" type="search" placeholder="Search sites" autocomplete="off" /></label>
+            </div>
+            <div id="lands" class="land-groups" role="radiogroup" aria-labelledby="h-land"></div>
+            <p id="land-empty" class="hint" hidden>No sites match. Try another word or tap All.</p>
+            <div id="land-card" class="spec"></div>
+            <details class="lesson"><summary><svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg>Why is everyone going to the south pole?</summary><div id="land-lesson"></div></details>
+          </div>
+        </section>
+
+        <section class="step" id="step-2" data-step="2" aria-labelledby="h-step-2">
+          <h2 class="step-h" id="h-step-2"><span class="idx">02</span><span class="head">Pick a launch site</span></h2>
+          <p class="hint">Tap a site in the list or a pin on the globe.</p>
+          <div id="sites" class="chips" role="radiogroup" aria-labelledby="h-step-2"></div>
+          <div id="site-card" class="spec"></div>
+          <details class="lesson"><summary><svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg>Why does the launch site matter?</summary><div id="site-lesson"></div></details>
+        </section>
+
+        <section class="step" id="step-3" data-step="3" aria-labelledby="h-step-3">
+          <h2 class="step-h" id="h-step-3"><span class="idx">03</span><span class="head">Choose a launch day</span></h2>
+          <div class="cal-head">
+            <button id="cal-prev" class="btn icon-only" type="button" aria-label="Previous month"><svg class="i" aria-hidden="true"><use href="#i-chev-l"/></svg></button>
+            <b id="cal-title" class="head" aria-live="polite"></b>
+            <button id="cal-next" class="btn icon-only" type="button" aria-label="Next month"><svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
+          </div>
+          <p id="cal-note" class="cal-note"></p>
+          <div class="dow" aria-hidden="true"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+          <div id="calendar" class="calendar" role="group" aria-labelledby="h-step-3"></div>
+          <div id="date-card" class="spec"></div>
+          <details class="lesson"><summary><svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg>Why do some days work better?</summary><div id="date-lesson"></div></details>
+        </section>
+
+        <section class="step" id="step-4" data-step="4" aria-labelledby="h-step-4">
+          <h2 class="step-h" id="h-step-4"><span class="idx">04</span><span class="head">Your spacecraft</span></h2>
+          <div id="tanks" role="radiogroup" aria-labelledby="h-step-4">
+            <button type="button" class="dest tank" role="radio" data-tank="45"><svg class="g" aria-hidden="true"><use href="#i-fuel"/></svg><span><b>Explorer</b><small>Enough for orbits around Earth and the Moon</small></span><span class="u">45<em>units</em></span></button>
+            <button type="button" class="dest tank" role="radio" data-tank="65"><svg class="g" aria-hidden="true"><use href="#g-surface"/></svg><span><b>Lander stack</b><small>The bigger stack you need to land, like Apollo's lunar module</small></span><span class="u">65<em>units</em></span></button>
+          </div>
+          <p class="hint">After the rocket reaches orbit, this tank pays for every burn. 1 unit = 100 m/s of speed change.</p>
+        </section>
+
+        <section class="step" id="step-5" data-step="5" aria-labelledby="h-step-5">
+          <h2 class="step-h" id="h-step-5"><span class="idx">05</span><span class="head">Fuel check</span></h2>
+          <div id="summary"></div>
+        </section>
+
+        <footer class="mp-foot">
+          Paths are computed with Earth's and the Moon's gravity (the three-body problem), using NASA/JPL orbit data. Moon and Sun positions are calculated for your date. Simplified for learning: not for real mission planning.
+          Images: NASA Scientific Visualization Studio. <a href="/about#credits">Credits</a>
+        </footer>
+      </div>
+      <div class="dock" id="dock">
+        <div class="dock-fuel">
+          <div class="dock-h"><span class="label">Fuel check</span><span class="num" id="dock-num"></span></div>
+          <div id="dock-gauge" class="gauge" role="meter" aria-label="Fuel needed from your tank"></div>
+          <ul id="dock-burns" class="burnlist"></ul>
+          <p id="dock-verdict" class="verdict"></p>
+        </div>
+        <div class="dock-nav">
+          <button id="step-back" class="btn" type="button"><svg class="i" aria-hidden="true"><use href="#i-chev-l"/></svg>Back</button>
+          <button id="step-next" class="btn solid" type="button">Next<svg class="i" aria-hidden="true"><use href="#i-chev-r"/></svg></button>
+        </div>
+        <button id="launch" class="launch" type="button"><svg aria-hidden="true"><use href="#i-rocket"/></svg><span id="launch-text">Launch</span></button>
+      </div>
+    </aside>
+
+    <main id="stage" aria-label="3D view of Earth, the Moon and your flight">
+      <div id="intro" class="intro">
+        <div class="label">Mission planner</div>
+        <h1 class="hero">Plan a trip to the Moon</h1>
+        <p>Pick where to go, where to launch from and which day. Then fly a real path through Earth's and the Moon's gravity.</p>
+      </div>
+      <p id="stage-hint" class="stage-hint"><svg class="i" aria-hidden="true"><use href="#i-pin"/></svg><span>Drag to turn the view. Tap a pin to pick it.</span></p>
+      <div id="pin-legend" class="pin-legend" hidden><span><i style="--c:var(--heritage)"></i>History</span><span><i style="--c:var(--trace)"></i>Planned or candidate</span><span><i class="ring"></i>Crash site</span></div>
+
+      <div id="hud" hidden>
+        <h1 class="sr-only">Your flight</h1>
+        <div class="hud-top">
+          <div class="tele">
+            <div class="clock"><div class="label">Mission time</div><div class="num" id="met"></div><div class="date" id="met-date"></div></div>
+            <div class="readouts" id="stats"></div>
+          </div>
+          <div class="hud-right">
+            <div class="hud-ctrls">
+              <div class="seg" id="view-seg" role="group" aria-label="View">
+                <button type="button" data-view="space" aria-pressed="true"><svg class="i" aria-hidden="true"><use href="#i-orbit"/></svg>Space view</button>
+                <button type="button" data-view="moon" aria-pressed="false"><svg class="i" aria-hidden="true"><use href="#i-frame"/></svg>Moon view</button>
+              </div>
+              <button id="cam-auto" class="btn on" type="button" aria-pressed="true" aria-label="Auto camera"><svg class="i" aria-hidden="true"><use href="#i-camera"/></svg><span>Auto camera</span></button>
+              <button id="back-plan" class="btn" type="button" aria-label="Plan" aria-keyshortcuts="P"><svg class="i" aria-hidden="true"><use href="#i-edit"/></svg><span>Plan</span></button>
+            </div>
+            <div id="view-badge" class="panel view-badge" hidden><svg class="i" aria-hidden="true"><use href="#i-frame"/></svg><span>Moon view: Earth and the Moon hold still, so orbits keep their shape. <button type="button" class="term" data-term="rotating-frame">What's this?</button></span></div>
+          </div>
+        </div>
+        <div id="burn-banner" class="burn-banner" hidden><svg class="i" aria-hidden="true"><use href="#i-burn"/></svg><span id="burn-text"></span></div>
+        <div class="hud-bottom" id="hud-bottom">
+          <section class="panel caption" id="caption" aria-labelledby="cap-title">
+            <div class="top">
+              <div><div class="label" id="cap-count"></div><h2 class="title" id="cap-title"></h2></div>
+              <button type="button" class="why" id="cap-why"><svg class="i" aria-hidden="true"><use href="#i-why"/></svg>Why?</button>
+            </div>
+            <p id="cap-text"></p>
+          </section>
+          <div class="hud-gap"></div>
+          <section class="panel fuel" aria-label="Fuel">
+            <div class="row"><span class="label">Fuel</span><span class="num" id="fuel-num"></span></div>
+            <div id="fuel-gauge" class="gauge" role="meter" aria-label="Fuel left in the tank"></div>
+            <p class="next" id="fuel-next"></p>
+          </section>
+          <div class="strip">
+            <button id="play" class="play" type="button" aria-label="Pause" aria-keyshortcuts="Space"><svg aria-hidden="true"><use href="#i-pause"/></svg></button>
+            <div class="phases-wrap">
+              <div id="phases" class="phases" aria-hidden="true"></div>
+              <input id="scrub" type="range" min="0" max="1000" value="0" step="1" aria-label="Mission timeline" aria-keyshortcuts="ArrowLeft ArrowRight" />
+            </div>
+            <div class="seg speed" id="speed-seg" role="group" aria-label="Playback speed">
+              <button type="button" data-speed="1" aria-pressed="false">1×</button>
+              <button type="button" data-speed="2" aria-pressed="false">2×</button>
+              <button type="button" data-speed="3" aria-pressed="false">4×</button>
+            </div>
+          </div>
+        </div>
+        <section id="endcard" class="panel endcard" aria-labelledby="end-h" hidden></section>
+        <div id="coach" class="coach" role="dialog" aria-labelledby="coach-h" hidden></div>
+      </div>
+    </main>
+  </div>
+
+  <div id="sr-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+  <div id="popover" class="popover" role="dialog" aria-labelledby="pop-h" hidden></div>
+  <dialog id="modal" class="modal" aria-labelledby="modal-h">
+    <button type="button" class="btn icon-only close" aria-label="Close"><svg class="i" aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="modal-body"></div>
+  </dialog>
+  <dialog id="briefing" class="briefing" aria-labelledby="brief-h" aria-describedby="brief-d"></dialog>
+  <script type="module" src="/src/mission/main.ts"></script>
+</body>
+</html>

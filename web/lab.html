@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#04060A" />
+  <title>Orbit lab · Sicklunar</title>
+  <meta name="description" content="Explore real three-body orbits between Earth and the Moon: halos, NRHOs, distant retrograde orbits, transfer routes and sensor coverage, from NASA/JPL data." />
+  <link rel="canonical" href="https://sicklunar.com/lab" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sicklunar" />
+  <meta property="og:title" content="Orbit lab · Sicklunar" />
+  <meta property="og:description" content="Real paths between Earth and the Moon. Explore three-body orbit families, transfer routes and sensor coverage." />
+  <meta property="og:url" content="https://sicklunar.com/lab" />
+  <meta property="og:image" content="https://sicklunar.com/og-image.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg?v=1" type="image/svg+xml" />
+  <link rel="icon" href="/favicon-32.png?v=1" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=1" />
+  <link rel="manifest" href="/site.webmanifest" />
+</head>
+<body class="lab">
+  <header id="site-nav" data-page="lab"></header>
+  <div id="app">
+    <aside id="panel" aria-label="Orbit lab controls">
+      <div class="panel-head">
+        <h1 class="visually-hidden">Orbit lab</h1>
+        <div id="modes" class="modes" role="tablist" aria-label="Lab mode">
+          <button role="tab" id="tab-viewer" data-mode="viewer" aria-selected="true" aria-controls="mode-viewer" tabindex="0">Viewer</button>
+          <button role="tab" id="tab-planner" data-mode="planner" aria-selected="false" aria-controls="mode-planner" tabindex="-1">Planner</button>
+          <button role="tab" id="tab-coverage" data-mode="coverage" aria-selected="false" aria-controls="mode-coverage" tabindex="-1">Coverage</button>
+        </div>
+        <button id="collapse" class="btn icon-only" aria-label="Hide controls" aria-controls="panel-body" aria-expanded="true"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg></button>
+      </div>
+
+      <div id="panel-body">
+      <section id="mode-viewer" class="mode" role="tabpanel" aria-labelledby="tab-viewer" tabindex="-1">
+        <h2 class="label">Key orbits</h2>
+        <div id="presets" class="korbits" role="group" aria-label="Key orbits"></div>
+
+        <h2 class="label"><label for="family">Family</label></h2>
+        <div class="select-wrap"><select id="family"></select></div>
+        <label class="slider">
+          <span>Member <b id="member-label"></b></span>
+          <input id="member" type="range" min="0" max="23" step="1" value="0" />
+        </label>
+
+        <div id="info" class="spec" aria-live="polite"></div>
+
+        <h2 class="label">View</h2>
+        <div class="row">
+          <label>Frame
+            <span class="select-wrap"><select id="frame">
+              <option value="rotating">Rotating (Earth-Moon line fixed)</option>
+              <option value="inertial-earth">Inertial, Earth-centered</option>
+              <option value="inertial-moon">Inertial, Moon-centered</option>
+            </select></span>
+          </label>
+        </div>
+        <div class="row">
+          <label>Center
+            <span class="select-wrap"><select id="center">
+              <option value="secondary">Moon</option>
+              <option value="primary">Earth</option>
+              <option value="orbit">Orbit</option>
+              <option value="barycenter">Barycenter</option>
+            </select></span>
+          </label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" id="show-family" checked /> Whole family</label>
+          <label><input type="checkbox" id="show-lpts" checked /> Lagrange points</label>
+          <label><input type="checkbox" id="show-labels" checked /> Labels</label>
+          <label><input type="checkbox" id="big-bodies" /> Enlarge Earth and Moon ×5</label>
+        </div>
+        <label class="slider"><span>Animation speed <b id="speed-label"></b></span>
+          <input id="speed" type="range" min="0" max="100" value="50" />
+        </label>
+        <p class="clock num" id="clock"></p>
+      </section>
+
+      <section id="mode-planner" class="mode" role="tabpanel" aria-labelledby="tab-planner" tabindex="-1" hidden>
+        <h2 class="label">Route</h2>
+        <label>From<span class="select-wrap"><select id="pl-from"></select></span></label>
+        <div class="row swap-row"><button id="pl-swap" class="btn ghost" aria-label="Swap from and to"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M8 4v16M8 4L4.5 7.5M8 4l3.5 3.5M16 20V4M16 20l-3.5-3.5M16 20l3.5-3.5"/></svg>Swap</button></div>
+        <label>To<span class="select-wrap"><select id="pl-to"></select></span></label>
+        <h2 class="label">Options</h2>
+        <div class="checks one">
+          <label><input type="checkbox" id="pl-slow" checked /> Allow slow low-energy transfers (&gt; 30 days)</label>
+          <label><input type="checkbox" id="pl-rev" checked /> Run published legs in reverse when no reverse is published</label>
+          <label><input type="checkbox" id="pl-aero" checked /> Allow aerocapture at Earth</label>
+          <label><input type="checkbox" id="pl-inf" checked /> Include estimated legs (not from a published table)</label>
+          <label><input type="checkbox" id="pl-md" /> Include lunar mass driver (no funded program)</label>
+        </div>
+        <div class="row two">
+          <label>Use each range's
+            <span class="select-wrap"><select id="pl-est"><option value="min">optimistic end</option><option value="max">conservative end</option></select></span>
+          </label>
+          <label>Engine
+            <span class="select-wrap"><select id="pl-isp"><option value="320">storable, Isp 320 s</option><option value="380">methalox, Isp 380 s</option><option value="450" selected>hydrolox, Isp 450 s</option></select></span>
+          </label>
+        </div>
+        <h2 class="label">Best routes</h2>
+        <p class="hint">None of these is both cheaper and faster than another.</p>
+        <div id="pl-routes" class="routes" role="group" aria-label="Best routes"></div>
+        <div id="pl-detail" class="spec" aria-live="polite"></div>
+        <p class="note">Delta-v legs come from different studies with different assumptions (NASA LEAG 2012 chart, NASA 2023 Artemis architecture, JPL DESCANSO, Purdue, AMOS papers), so summed routes are rough. Every leg links its source.</p>
+      </section>
+
+      <section id="mode-coverage" class="mode" role="tabpanel" aria-labelledby="tab-coverage" tabindex="-1" hidden>
+        <h2 class="label">Architectures</h2>
+        <div id="cv-presets" class="korbits" role="group" aria-label="Sensor architectures"></div>
+        <h2 class="label">Sensors</h2>
+        <div id="cv-sensors" class="sensors"></div>
+        <h2 class="label">Target and sensors</h2>
+        <label class="slider"><span>Target size (cross-section) <b id="cv-area-label"></b></span>
+          <input id="cv-area" type="range" min="-1" max="2" step="0.1" value="0" /></label>
+        <label class="slider"><span>Space sensor limit <b id="cv-maglim-space-label"></b></span>
+          <input id="cv-maglim-space" type="range" min="14" max="22" step="0.5" value="18" /></label>
+        <label class="slider"><span>Ground sensor limit <b id="cv-maglim-ground-label"></b></span>
+          <input id="cv-maglim-ground" type="range" min="14" max="22" step="0.5" value="18" /></label>
+        <fieldset class="row three">
+          <legend>Keep-out angles (degrees)</legend>
+          <label>Sun<input id="cv-sun" type="number" min="0" max="90" inputmode="numeric" /></label>
+          <label>Moon<input id="cv-moon" type="number" min="0" max="45" inputmode="numeric" /></label>
+          <label>Earth<input id="cv-earth" type="number" min="0" max="45" inputmode="numeric" /></label>
+        </fieldset>
+        <div class="row two">
+          <label>Grid<span class="select-wrap"><select id="cv-res"><option value="coarse" selected>coarse (fast)</option><option value="medium">medium</option><option value="fine">fine</option></select></span></label>
+          <label class="inline"><input type="checkbox" id="cv-plane" /> Earth-Moon plane only</label>
+        </div>
+        <button id="cv-run" class="btn solid wide">Run coverage</button>
+        <div class="heat-key" aria-hidden="true">
+          <span class="heat-ramp"></span>
+          <span class="heat-ticks"><span>Rarely in view</span><span>All month</span></span>
+        </div>
+        <div id="cv-stats" class="spec" aria-live="polite"></div>
+        <p class="note">Coverage = share of one month each point is seen by at least one sensor: sunlit, not behind Earth/Moon, outside Sun/Moon/Earth keep-outs, and bright enough (diffuse sphere, albedo 0.2). Defaults: AMOS 2024 (Bhadauria) for space keep-outs, AMOS 2020 (Dao) for ground (Sun 20°, Moon 5°). Ignores weather, per-site daylight and the Moon's 5° tilt.</p>
+      </section>
+
+      <footer class="note">Orbits: NASA/JPL Three-Body Periodic Orbits API, propagated in the CR3BP. Not mission-grade.</footer>
+      </div>
+    </aside>
+    <main id="stage" class="scene">
+      <div id="hud">
+        <div id="title" class="lab-title"></div>
+        <div id="scalebar" class="scalebar num" aria-hidden="true"><div class="bar"></div><span></span></div>
+      </div>
+      <div class="lab-views">
+        <div class="seg" id="views" role="group" aria-label="Camera view">
+          <button data-view="top">Top</button><button data-view="side">Side</button><button data-view="front">From Earth</button><button data-view="iso" aria-pressed="true">3D</button>
+        </div>
+        <button id="play" class="btn icon-only" aria-label="Pause animation"></button>
+      </div>
+      <button id="expand" class="btn" aria-controls="panel-body" aria-expanded="false" hidden><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 15l6-6 6 6"/></svg>Controls</button>
+    </main>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

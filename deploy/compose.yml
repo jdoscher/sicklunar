@@ -1,0 +1,15 @@
+name: cislunar
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: cislunar-web:latest
+    restart: unless-stopped
+    ports:
+      - "${CISLUNAR_PORT:-8095}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

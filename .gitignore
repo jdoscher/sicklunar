@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.env.*
+!.env.example
+data/
+logs/
+*.log
+*.db
+*.db-*
+*token*.json
+web/node_modules/
+web/dist/
+web/public/data/
+*.egg-info/
+/drawings/
